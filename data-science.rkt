@@ -5,6 +5,9 @@
 ;;; automatic ->number conversion when appropriate), and plotting
 ;;; functions.
 
+;;; Dependencies
+(require csv-reading)
+
 ;;; Can't live without alist-ref from Chicken scheme. Let's recreate
 ;;; it here, but with a shorter name
 (define (aref idx lst)
