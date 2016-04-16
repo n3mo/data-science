@@ -65,3 +65,21 @@
 (define (aggregate f factors lst)
   (let ((tmp (group-with factors lst)))
     (map (lambda (x) (list (car x) (f (cdr x)))) tmp)))
+
+;;; Generating discrete histograms of (sorted!) binned samples should
+;;; be easier. The following generates sorted bins suitable for
+;;; plotting with `discrete-histogram`. This function is similar to
+;;; `samples->hash` but does not return a hash or dotted pairs. The
+;;; return value is a list of (key value) pairs sorted by keys.
+;;; Example: '(3 3 2 1 4 4 4) => '((1 1) (2 1) (3 2) (4 3))
+(define (sorted-counts lst)
+  (let-values ([(keys values) (count-samples lst)])
+	   (sort (map list keys values) (λ (x y) (< (car x) (car y))))))
+
+;;; This recreates the `hist` function from R. Use this for
+;;; quick and dirty histograms. If you want control over the plot's
+;;; styling, call `sorted-counts` manually and pass the result to
+;;; `discrete-histogram` yourself.
+(define (hist lst)
+  (plot (discrete-histogram (sorted-counts lst))))
+
