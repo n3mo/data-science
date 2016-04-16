@@ -6,7 +6,7 @@
 ;;; functions.
 
 ;;; Dependencies
-(require csv-reading)
+(require csv-reading math)
 
 ;;; Can't live without alist-ref from Chicken scheme. Let's recreate
 ;;; it here, but with a shorter name
