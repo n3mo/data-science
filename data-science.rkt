@@ -6,27 +6,35 @@
 ;;; functions.
 
 ;;; Dependencies
-(require csv-reading math)
+(require csv-reading math plot)
 
 ;;; Can't live without alist-ref from Chicken scheme. Let's recreate
 ;;; it here, but with a shorter name
 (define (aref idx lst)
-  (cdr (assv idx lst)))
+  (let ([tmp (assv idx lst)])
+    (if tmp
+	(cadr tmp)
+	#f)))
 
 ;;; Convenience csv reader that converts everything internally to
 ;;; numbers by default. It also igores lines in the input file
-;;; commented with the "#" character
-(define (read-csv file-path #:->number? [->number? #t])
+;;; commented with the "#" character. When header? is not #f, the
+;;; first line of the file is assumed to contain column names.
+(define (read-csv file-path
+		  #:->number? [->number? #t]
+		  #:header? [header? #t])
   (let ((csv-reader (make-csv-reader-maker
 		     '((comment-chars #\#))))) 
     (with-input-from-file (string->path file-path)
       (lambda ()
-	(let ((tmp (csv->list (csv-reader (current-input-port)))))
+	(let* ((tmp (csv->list (csv-reader (current-input-port)))))
 	  (if ->number?
 	      ;; try to convert everything to numbers rather than
 	      ;; strings. This should be made smarter, converting only
 	      ;; those columns which are actually numbers
-	      (map (lambda (x) (map string->number x)) tmp)
+	      (if header?
+		  (cons (car tmp) (map (lambda (x) (map string->number x)) (cdr tmp)))
+		  (map (lambda (x) (map string->number x)) tmp))
 	      ;; Else, leave everything as strings
 	      tmp))))))
 
@@ -47,6 +55,28 @@
 ;;; use (aref idx lst) in place of "col"
 (define (cidx lsts col val)
   (filter (lambda (x) (equal? (list-ref x col) val)) lsts))
+
+;;; Uninformative (i.e., bad) name for a function that allows you to
+;;; extract columns from columnar data (list-of-lists). The short
+;;; (i.e., good) name helps to avoid complex and overly-long commands
+;;; to do this manually. This function expects that the first "row" of
+;;; data contains the column names, or "header," and the remaining
+;;; rows contain the data. Row names are accessed as symbols even if
+;;; the actual data contains string headers. `lst` is a list-of-lists,
+;;; as created, for example, by csv->list or read-csv. `name` is a
+;;; symbol of a valid column name contained in the car of `lst`. Only
+;;; the non-header rows of the requested column are returned.
+(define ($ lst name)
+  (let* ([header (car lst)]
+	 [fn (cond
+	      [(string? (car header)) string->symbol]
+	      [(symbol? (car header)) identity]
+	      [else (error "Header must be of type string or symbol")])])
+    (let* ([header-index (map list (map fn header) (range (length header)))]
+	   [idx (aref name header-index)])
+      (if idx
+	  (map (λ (x) (list-ref x idx)) (cdr lst))
+	  (error "Invalid column name")))))
 
 ;;; The group-by included with Racket doesn't quite do what we
 ;;; want. We want to be able to take TWO lists, and group list-2 using
@@ -74,7 +104,10 @@
 ;;; Example: '(3 3 2 1 4 4 4) => '((1 1) (2 1) (3 2) (4 3))
 (define (sorted-counts lst)
   (let-values ([(keys values) (count-samples lst)])
-	   (sort (map list keys values) (λ (x y) (< (car x) (car y))))))
+    (sort (map list keys values)
+	  (λ (x y) (if (number? (car x))
+		       (< (car x) (car y))
+		       (string<? (car x) (car y)))))))
 
 ;;; This recreates the `hist` function from R. Use this for
 ;;; quick and dirty histograms. If you want control over the plot's
