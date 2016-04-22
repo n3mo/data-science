@@ -21,11 +21,11 @@
 ;;; commented with the "#" character. When header? is not #f, the
 ;;; first line of the file is assumed to contain column names.
 (define (read-csv file-path
-		  #:->number? [->number? #t]
+		  #:->number? [->number? #f]
 		  #:header? [header? #t])
   (let ((csv-reader (make-csv-reader-maker
 		     '((comment-chars #\#))))) 
-    (with-input-from-file (string->path file-path)
+    (with-input-from-file file-path
       (lambda ()
 	(let* ((tmp (csv->list (csv-reader (current-input-port)))))
 	  (if ->number?
@@ -116,3 +116,10 @@
 (define (hist lst)
   (plot (discrete-histogram (sorted-counts lst))))
 
+;;; When you have a single list of values, it is useful to be able to
+;;; plot the data as y-values. This requires creating token x values
+;;; with (range (length ys)). Better to make this a short call for
+;;; convenience. Given a list of y values, this returns (x1, y1) pairs
+;;; for plotting
+(define (xs ys)
+  (map list (range (length ys)) ys))
