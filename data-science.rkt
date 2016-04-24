@@ -123,3 +123,24 @@
 ;;; for plotting
 (define (xs ys)
   (map list (range (length ys)) ys))
+
+;;; Simple linear least squares regression: y = mx + b
+;;; Returns two values (slope intercept) 
+;;; Example: Given a list of x values and y values:
+;;;
+;;; (define xs (range 100))
+;;; (define ys (map + xs (sample (normal-dist 0 30) 100)))
+;;; (let* ([coef (linear-regression units minutes)]
+;;;        [slope (car coef)]
+;;;        [intercept (cdr coef)])
+;;;   (plot (list (points (map vector units minutes))
+;;; 	      (function (λ (x) (+ (* x slope) intercept))))))
+(define (linear-regression xs ys)
+  (let* ([x-hat (mean xs)]
+	 [y-hat (mean ys)]
+	 [x-devs (map (λ (x) (- x x-hat)) xs)]
+	 [y-devs (map (λ (x) (- x y-hat)) ys)]
+	 [numerator (apply + (map * x-devs y-devs))]
+	 [x-sqr (apply + (map (λ (x) (expt x 2)) x-devs))]
+	 [slope (/ numerator x-sqr)])
+    (list slope (- y-hat (* slope x-hat)))))
