@@ -6,7 +6,7 @@
 ;;; functions.
 
 ;;; Dependencies
-(require csv-reading math plot)
+(require csv-reading math math/matrix plot)
 
 ;;; Can't live without alist-ref from Chicken scheme. Let's recreate
 ;;; it here, but with a shorter name
@@ -124,23 +124,74 @@
 (define (xs ys)
   (map list (range (length ys)) ys))
 
+;;; Regression solver using linear algebra.
+;;; Returns '(intercept slope1 slope2 ...)
+;;; Example 1: Simple Linear Regression
+;;; Given a list of x values and y values:
+;;;
+;;; (define xs (range 100))
+;;; (define ys (map + xs (sample (normal-dist 0 30) 100)))
+;;; (let* ([coef (linear-model xs ys)]
+;;;        [slope (cadr coef)]
+;;;        [intercept (car coef)])
+;;;   (plot (list (points (map vector xs ys))
+;;; 	      (function (λ (x) (+ (* x slope) intercept))))))
+;;;
+;;; Example 2: Multiple linear regression.
+;;; Multiple (additive) predictors can be used. With two predictors,
+;;; X1 & X2, each predictor should be a "column" in a list-of-list,
+;;; such as '((X1 X2) (X1 X2) ...). Say we have two predictors, X1 and
+;;; X2, and observed outcome Y:
+;;;
+;;; (define x1 '(52 59 67 73 64 74 54 61 65 46 72))
+;;; (define x2 '(173 184 194 211 196 220 188 188 207 167 217))
+;;; (define y '(132 143 153 162 154 168 137 149 159 128 166))
+;;; (linear-model (map list x1 x2) y)
+;;; ;;; Plot a surface?
+;;; (let* ([coef (linear-model (map list x1 x2) y)]
+;;;        [intercept (first coef)]
+;;;        [b1 (second coef)]
+;;;        [b2 (third coef)])
+;;;   (plot3d (list (points3d (map vector x1 x2 y))
+;;; 		(surface3d (λ (x1 x2) (+ intercept (* b1 x1) (* b2 x2)))))))
+(define (linear-model xs ys)
+  (let ([X (list*->matrix
+	    (map (λ (x y) (flatten (list x y)))
+		 (build-list (length xs) (const 1)) xs))]
+	[Y (->col-matrix ys)])
+    ;; We solve for A, a col-matrix containing [intercept slope]
+    ;; A = ((X^TX)^-1)X^TY
+    ;; Where X^T means transpose of X, and ^-1 means inverse
+    (matrix->list (matrix*
+		   (matrix-inverse (matrix* (matrix-transpose X) X))
+		   (matrix* (matrix-transpose X) Y)))))
+
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; LEGACY CODE
+;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;; Simple linear least squares regression: y = mx + b
-;;; Returns two values (slope intercept) 
+;;; Returns two values (slope intercept)
+;;; This was experimental. You should use the function `linear-model`
+;;; instead, which solves the regression equations more efficiently
+;;; with linear algebra, and allows for multiple regression
 ;;; Example: Given a list of x values and y values:
 ;;;
 ;;; (define xs (range 100))
 ;;; (define ys (map + xs (sample (normal-dist 0 30) 100)))
-;;; (let* ([coef (linear-regression units minutes)]
+;;; (let* ([coef (linear-regression xs ys)]
 ;;;        [slope (car coef)]
-;;;        [intercept (cdr coef)])
-;;;   (plot (list (points (map vector units minutes))
+;;;        [intercept (cadr coef)])
+;;;   (plot (list (points (map vector xs ys))
 ;;; 	      (function (λ (x) (+ (* x slope) intercept))))))
-(define (linear-regression xs ys)
-  (let* ([x-hat (mean xs)]
-	 [y-hat (mean ys)]
-	 [x-devs (map (λ (x) (- x x-hat)) xs)]
-	 [y-devs (map (λ (x) (- x y-hat)) ys)]
-	 [numerator (apply + (map * x-devs y-devs))]
-	 [x-sqr (apply + (map (λ (x) (expt x 2)) x-devs))]
-	 [slope (/ numerator x-sqr)])
-    (list slope (- y-hat (* slope x-hat)))))
+;; (define (linear-regression xs ys)
+;;   (let* ([x-hat (mean xs)]
+;; 	 [y-hat (mean ys)]
+;; 	 [x-devs (map (λ (x) (- x x-hat)) xs)]
+;; 	 [y-devs (map (λ (x) (- x y-hat)) ys)]
+;; 	 [numerator (apply + (map * x-devs y-devs))]
+;; 	 [x-sqr (apply + (map (λ (x) (expt x 2)) x-devs))]
+;; 	 [slope (/ numerator x-sqr)])
+;;     (list slope (- y-hat (* slope x-hat)))))
+
+;;; End of file data-science.rkt
