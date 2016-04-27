@@ -125,7 +125,7 @@
   (map list (range (length ys)) ys))
 
 ;;; Regression solver using linear algebra.
-;;; Returns '(intercept slope1 slope2 ...)
+;;; Returns '(intercept coefficient-1 coefficient-2 ...)
 ;;; Example 1: Simple Linear Regression
 ;;; Given a list of x values and y values:
 ;;;
