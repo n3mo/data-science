@@ -7,6 +7,8 @@
 
 ;;; Dependencies
 (require csv-reading math math/matrix plot)
+(provide aref read-csv ci cidx $ group-with aggregate sorted-counts
+	 hist xs linear-model)
 
 ;;; Can't live without alist-ref from Chicken scheme. Let's recreate
 ;;; it here, but with a shorter name
