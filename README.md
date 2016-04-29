@@ -13,7 +13,7 @@ raco pkg install https://github.com/n3mo/data-science.git
 
 # Usage
 
-## Inferential Statistics
+## Statistical Tests and Models
 A host of statistical tests and models will be supported, including things such as multiple linear regression, t tests, chi-squared tests, ANOVAs, etc.
 
 ### Linear Model
@@ -24,11 +24,14 @@ A host of statistical tests and models will be supported, including things such 
 
 Estimates simple and multiple linear regression for independent variable(s) *xs* and dependent variable *y*. Returns a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*.  For simple linear regression, *xs* should be a single list of observations. For multiple regression, *xs* should be a list-of-lists contain independent variables arranged by "columns". Observed values of the dependent variable should be passed as *y*.
 
-Examples:
+Example: Simple Linear Regression
 
 ``` racket
-;;; Generate some noisy data
+(require math)
+
+;;; Independent variable
 (define xs (range 100))
+;;; Generate some noisy dependent variable data
 (define ys (map + xs (sample (normal-dist 0 30) 100)))
 
 ;;; Check the coefficients (intercept slope)
@@ -44,6 +47,21 @@ Examples:
 ```
 
 ![Model Fit](https://github.com/n3mo/data-science/raw/master/img/regression-example.png)
+
+Example: Multiple Linear Regression
+
+``` racket
+;;; First independent variable
+(define x1 '(52 59 67 73 64 74 54 61 65 46 72))
+;;; Second independent variable
+(define x2 '(173 184 194 211 196 220 188 188 207 167 217))
+;;; Dependent variable
+(define y '(132 143 153 162 154 168 137 149 159 128 166))
+;;; Fit the model
+(linear-model (map list x1 x2) y)
+
+;; --> '(89144774/2876185 2477588/2876185 963117/2876185)
+```
 
 ## Split->Apply->Combine
 `data-science` provides a collection of ultility functions for breaking your data into meaningful pieces, applying functions to each piece, and then recombining the results. In fact, the filter/map/apply approach of lisp-like languages is well suited to such tasks. However, with complex analyses, commands can grow quite complex and cumbersome, and can mask their intended purpose. The following functions provide convenient short-hand procedures that aim to be *expressive, yet concise*.
