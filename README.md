@@ -13,10 +13,42 @@ raco pkg install https://github.com/n3mo/data-science.git
 
 # Usage
 
+## Inferential Statistics
+A host of statistical tests and models will be supported, including things such as multiple linear regression, t tests, chi-squared tests, ANOVAs, etc.
+
+### Linear Model
+
+``` racket
+(linear-model xs y)
+```
+
+Estimates simple and multiple linear regression for independent variable(s) *xs* and dependent variable *y*. Returns a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*.  For simple linear regression, *xs* should be a single list of observations. For multiple regression, *xs* should be a list-of-lists contain independent variables arranged by "columns". Observed values of the dependent variable should be passed as *y*.
+
+Examples:
+
+``` racket
+;;; Generate some noisy data
+(define xs (range 100))
+(define ys (map + xs (sample (normal-dist 0 30) 100)))
+
+;;; Check the coefficients (intercept slope)
+(linear-model xs y)
+
+;;; Plot the raw data and the model
+(require plot)
+(let* ([coef (linear-model xs ys)]
+       [slope (cadr coef)]
+       [intercept (car coef)])
+  (plot (list (points (map vector xs ys))
+	      (function (λ (x) (+ (* x slope) intercept))))))
+```
+
+![Splash Screen](https://github.com/n3mo/data-science/raw/master/img/regression-example.png)
+
 ## Split->Apply->Combine
 `data-science` provides a collection of ultility functions for breaking your data into meaningful pieces, applying functions to each piece, and then recombining the results. In fact, the filter/map/apply approach of lisp-like languages is well suited to such tasks. However, with complex analyses, commands can grow quite complex and cumbersome, and can mask their intended purpose. The following functions provide convenient short-hand procedures that aim to be *expressive, yet concise*.
 
-### $
+### $ (Column-indexing)
 
 ``` racket
 ($ lst index)
@@ -28,14 +60,14 @@ Examples:
 
 ``` racket
 ;;; Numerical indexing
-> (define my-data '((1 2 3) (4 5 6) (7 8 9) (10 11 12)))
-> ($ my-data 0)
-'(1 4 7 10)
+(define my-data '((1 2 3) (4 5 6) (7 8 9) (10 11 12)))
+($ my-data 0)
+;; --> '(1 4 7 10)
 
 ;;; Indexing by name
-> (define my-data '((age rank id) (21 1 100) (18 2 101) (32 1 102) (19 4 103)))
-> ($ my-data 'rank)
-'(1 2 1 4)
+(define my-data '((age rank id) (21 1 100) (18 2 101) (32 1 102) (19 4 103)))
+($ my-data 'rank)
+;; --> '(1 2 1 4)
 ```
 
 # License

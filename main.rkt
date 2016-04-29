@@ -162,11 +162,11 @@
 ;;;        [b2 (third coef)])
 ;;;   (plot3d (list (points3d (map vector x1 x2 y))
 ;;; 		(surface3d (λ (x1 x2) (+ intercept (* b1 x1) (* b2 x2)))))))
-(define (linear-model xs ys)
+(define (linear-model xs y)
   (let ([X (list*->matrix
 	    (map (λ (x y) (flatten (list x y)))
 		 (build-list (length xs) (const 1)) xs))]
-	[Y (->col-matrix ys)])
+	[Y (->col-matrix y)])
     ;; We solve for A, a col-matrix containing [intercept slope]
     ;; A = ((X^TX)^-1)X^TY
     ;; Where X^T means transpose of X, and ^-1 means inverse
