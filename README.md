@@ -22,7 +22,9 @@ A host of statistical tests and models will be supported, including things such 
 (linear-model xs y)
 ```
 
-Estimates simple and multiple linear regression for independent variable(s) *xs* and dependent variable *y*. Returns a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*.  For simple linear regression, *xs* should be a single list of observations. For multiple regression, *xs* should be a list-of-lists contain independent variables arranged by "columns". Observed values of the dependent variable should be passed as *y*.
+Estimates simple and multiple linear regression for independent variable(s) *xs* and dependent variable *y*. Returns a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*.  For simple linear regression, *xs* should be a single list of observations. For multiple regression, *xs* should be a list-of-lists containing independent variables arranged by "columns". Observed values of the dependent variable should be passed as *y*.
+
+**TODO: Provide p-value estimates, residuals, etc.**
 
 Example: Simple Linear Regression
 
