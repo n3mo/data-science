@@ -43,7 +43,7 @@ Examples:
 	      (function (λ (x) (+ (* x slope) intercept))))))
 ```
 
-![Splash Screen](https://github.com/n3mo/data-science/raw/master/img/regression-example.png)
+![Model Fit](https://github.com/n3mo/data-science/raw/master/img/regression-example.png)
 
 ## Split->Apply->Combine
 `data-science` provides a collection of ultility functions for breaking your data into meaningful pieces, applying functions to each piece, and then recombining the results. In fact, the filter/map/apply approach of lisp-like languages is well suited to such tasks. However, with complex analyses, commands can grow quite complex and cumbersome, and can mask their intended purpose. The following functions provide convenient short-hand procedures that aim to be *expressive, yet concise*.
