@@ -61,24 +61,30 @@
 ;;; Uninformative (i.e., bad) name for a function that allows you to
 ;;; extract columns from columnar data (list-of-lists). The short
 ;;; (i.e., good) name helps to avoid complex and overly-long commands
-;;; to do this manually. This function expects that the first "row" of
-;;; data contains the column names, or "header," and the remaining
+;;; to do this manually. This function expects either (1) that index
+;;; is a number, in which case the corresponding "column" is returned,
+;;; or (2) that index is a symbol. In this situation the first "row"
+;;; of data contains the column names, or "header," and the remaining
 ;;; rows contain the data. Row names are accessed as symbols even if
 ;;; the actual data contains string headers. `lst` is a list-of-lists,
 ;;; as created, for example, by csv->list or read-csv. `name` is a
 ;;; symbol of a valid column name contained in the car of `lst`. Only
 ;;; the non-header rows of the requested column are returned.
-(define ($ lst name)
-  (let* ([header (car lst)]
-	 [fn (cond
-	      [(string? (car header)) string->symbol]
-	      [(symbol? (car header)) identity]
-	      [else (error "Header must be of type string or symbol")])])
-    (let* ([header-index (map list (map fn header) (range (length header)))]
-	   [idx (aref name header-index)])
-      (if idx
-	  (map (λ (x) (list-ref x idx)) (cdr lst))
-	  (error "Invalid column name")))))
+(define ($ lst index)
+  (if (number? index)
+      (if (or (< index 0) (>= index (length (car lst))))
+	  (error "Invalid column number")
+	  (map (λ (x) (list-ref x index)) lst))
+   (let* ([header (car lst)]
+	  [fn (cond
+	       [(string? (car header)) string->symbol]
+	       [(symbol? (car header)) identity]
+	       [else (error "Header must be of type string or symbol")])])
+     (let* ([header-index (map list (map fn header) (range (length header)))]
+	    [name (aref index header-index)])
+       (if name
+	   (map (λ (x) (list-ref x name)) (cdr lst))
+	   (error "Invalid column name"))))))
 
 ;;; The group-by included with Racket doesn't quite do what we
 ;;; want. We want to be able to take TWO lists, and group list-2 using
