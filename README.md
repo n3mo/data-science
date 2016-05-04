@@ -65,6 +65,29 @@ Example: Multiple Linear Regression
 ;; --> '(89144774/2876185 2477588/2876185 963117/2876185)
 ```
 
+Example: Multiple Linear Regression With Interactions. Individual predictors represent main effects. The interaction between predictors is their product
+
+``` racket
+;;; First independent variable
+(define x1 '(52 59 67 73 64 74 54 61 65 46 72))
+;;; Second independent variable
+(define x2 '(173 184 194 211 196 220 188 188 207 167 217))
+;;; The interaction of x1 and x2 is their product
+(define interaction (map * x1 x2))
+;;; Dependent variable
+(define y '(132 143 153 162 154 168 137 149 159 128 166))
+;;; Fit the model
+(linear-model (map list x1 x2 interaction) y)
+
+;; --> '(1054612228677/92932149757 106305446023/92932149757 41389810584/92932149757 -295039649/185864299514)
+
+;;; Let's see the approximate decimal values
+(map exact->inexact (linear-model (map list x1 x2 interaction) y))
+
+;; --> '(11.348195769005791 1.1439038728897226 0.4453766612762809 -0.0015873927901779573)
+
+```
+
 ## Split->Apply->Combine
 `data-science` provides a collection of ultility functions for breaking your data into meaningful pieces, applying functions to each piece, and then recombining the results. In fact, the filter/map/apply approach of lisp-like languages is well suited to such tasks. However, with complex analyses, commands can grow quite complex and cumbersome, and can mask their intended purpose. The following functions provide convenient short-hand procedures that aim to be *expressive, yet concise*.
 
