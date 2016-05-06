@@ -174,6 +174,37 @@
 		   (matrix-inverse (matrix* (matrix-transpose X) X))
 		   (matrix* (matrix-transpose X) Y)))))
 
+;;; Version with rich output. Model parameters and inputed data
+;;; (packaged as matrices) returned as a hash
+(define (linear-model* xs ys)
+  (let ([X (list*->matrix
+	    (map (λ (x y) (flatten (list x y)))
+		 (build-list (length xs) (const 1)) xs))]
+	[Y (->col-matrix ys)])
+    ;; We solve for A, a col-matrix containing [intercept slope]
+    ;; A = ((X^TX)^-1)X^TY
+    ;; Where X^T means transpose of X, and ^-1 means inverse
+    (let* ([coef (matrix*
+		  (matrix-inverse (matrix* (matrix-transpose X) X))
+		  (matrix* (matrix-transpose X) Y))]
+	   [residuals (matrix- Y (matrix* X coef))]
+	   [n (matrix-num-rows X)]
+	   [p (sub1 (matrix-num-cols X))]
+	   [mse (/ (matrix-ref
+		    (matrix* 
+		     (matrix-transpose (matrix- Y (matrix* X coef)))
+		     (matrix- Y (matrix* X coef))) 0 0)
+		   (- n p))]
+	   [root-mse (sqrt mse)])
+      ;; Return a hash of model results
+      (hash 'X X 'Y Y
+	    'coef (matrix->vector* coef)
+	    'residuals (matrix->vector* residuals)
+	    'n n
+	    'p p
+	    'mse mse
+	    'root-mse root-mse))))
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; LEGACY CODE
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
