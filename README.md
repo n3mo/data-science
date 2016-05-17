@@ -182,7 +182,7 @@ Examples:
 			   [point-color "blue"])
   (plot (list (qq-plot* (sample (gamma-dist 2 2) 500))
               (function identity #:color "red" #:width 2))
-        #:x-label "Theoretical Quantiles (n = 500)"
+        #:x-label "Theoretical Quantiles"
         #:y-label "Sample Quantiles (n = 500)"))
 ```
 
