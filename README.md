@@ -33,11 +33,20 @@ Example: Simple Linear Regression
 
 ;;; Independent variable
 (define xs (range 100))
-;;; Generate some noisy dependent variable data
-(define ys (map + xs (sample (normal-dist 0 30) 100)))
 
-;;; Check the coefficients (intercept slope)
-(linear-model xs y)
+;;; Generate some noisy dependent variable data with a given
+;;; intercept and slope
+(define intercept 4.83)
+(define slope 1.27)
+(define ys (map + (map (λ (x) (+ (* x slope) intercept)) xs)
+			      (sample (normal-dist 0 30) 100)))
+
+
+;;; Try to recover the original coefficients (intercept slope)
+(linear-model xs ys)
+
+;; Results are pretty close given the noise
+;; --> '(0.3148930686704432 1.2717819785002806)
 
 ;;; Plot the raw data and the model
 (require plot)
