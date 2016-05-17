@@ -53,14 +53,14 @@ Estimates simple and multiple linear regression for independent variable(s) *xs*
 `linear-model` returns a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*.
 
 `linear-model*` returns a hash with the following fields
-- X -- Design matrix 
-- Y -- Response vector
-- coef -- a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*
-- residuals -- Y-Xβ as a list
-- n -- sample size
-- p -- number of predictors
-- mse -- mean squared error
-- root-mse -- root mean squared error
+- **X** --> Design matrix 
+- **Y** --> Response vector
+- **coef** --> a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*
+- **residuals** --> (Y-Xβ) as a list
+- **n** --> sample size
+- **p** --> number of predictors
+- **mse** --> mean squared error
+- **root-mse** --> root mean squared error
 
 Example: Simple Linear Regression
 
