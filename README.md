@@ -95,6 +95,24 @@ Example: Simple Linear Regression
 
 ![Model Fit](https://github.com/n3mo/data-science/raw/master/img/regression-example.png)
 
+For a more thorough analysis, it can be more useful to store the full model results as a hash using `linear-model*` and then work from there:
+
+```racket
+;;; Using the same data from the previous example
+
+;;; Fit the model and store the full results
+(define fit (linear-model* xs ys))
+
+;;; Let's inspect the coefficients
+(hash-ref fit 'coef)
+
+;;; Using the `qq-plot` functions, we can inspect the residuals to 
+;;; ensure normality
+(qq-plot* (hash-ref fit 'residuals))
+```
+
+![Model Fit](https://github.com/n3mo/data-science/raw/master/img/residuals-example.png)
+
 Example: Multiple Linear Regression
 
 ``` racket
