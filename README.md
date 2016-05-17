@@ -13,6 +13,29 @@ raco pkg install https://github.com/n3mo/data-science.git
 
 # Usage
 
+## General Utilities
+
+### z-transform data (Scale)
+
+```racket
+(scale lst)
+```
+
+Scales (via z-transformation) the data in `lst` such that `(mean lst) --> 0` and `(stddev lst) --> 1`
+
+Example:
+
+```racket 
+(scale '(6 2 4 19 3 6))
+
+;; --> '(-0.1168412475673972
+;;       -0.8178887329717804
+;;       -0.4673649902695888
+;;       2.1615630799968484
+;;       -0.6426268616206846
+;;       -0.1168412475673972)
+```
+
 ## Statistical Tests and Models
 A host of statistical tests and models will be supported, including things such as multiple linear regression, t tests, chi-squared tests, ANOVAs, etc.
 

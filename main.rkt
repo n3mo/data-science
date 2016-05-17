@@ -132,6 +132,31 @@
 (define (xs ys)
   (map list (range (length ys)) ys))
 
+;;; Simple z-transformation. Scales data to mean = 0 and stddev = 1
+(define (scale lst)
+  (let ([lst-mean (mean lst)]
+	[lst-stddev (stddev lst)])
+    (map (λ (x) (/ (- x lst-mean) lst-stddev)) lst)))
+
+;;; Q-Q Plot. Plots sample quantiles against theoretical quantiles
+;;; from a normal distribution with a mean and standard deviation
+;;; of the sample `lst`. By default, both quantiles are
+;;; z-transformed. Suppress this behavior with #:scale? #f
+(define (qq-plot lst #:scale? [scale? #t])
+  (let* ([n (length lst)]
+	 [lst-mean (mean lst)]
+	 [lst-stddev (stddev lst)]
+	 [probs (map (λ (x) (/ x (+ 2 n))) (range 1 (add1 n)))]
+	 [normal-quantiles
+	  (map (λ (x) (inv-cdf (normal-dist lst-mean lst-stddev) x)) probs)]
+	 ;; Scale the data?
+	 [xs (if scale? (scale normal-quantiles) normal-quantiles)]
+	 [ys (if scale? (scale lst) lst)])
+    (plot (points (map vector (sort-samples < xs)
+		       (sort-samples < ys)))
+	  #:x-label "Theoretical Normal Quantiles"
+	  #:y-label "Sample Quantiles")))
+
 ;;; Regression solver using linear algebra.
 ;;; Returns '(intercept coefficient-1 coefficient-2 ...)
 ;;; Example 1: Simple Linear Regression
@@ -198,39 +223,11 @@
 	   [root-mse (sqrt mse)])
       ;; Return a hash of model results
       (hash 'X X 'Y Y
-	    'coef (matrix->vector* coef)
-	    'residuals (matrix->vector* residuals)
+	    'coef (matrix->list coef)
+	    'residuals (matrix->list residuals)
 	    'n n
 	    'p p
 	    'mse mse
 	    'root-mse root-mse))))
-
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; LEGACY CODE
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;; Simple linear least squares regression: y = mx + b
-;;; Returns two values (slope intercept)
-;;; This was experimental. You should use the function `linear-model`
-;;; instead, which solves the regression equations more efficiently
-;;; with linear algebra, and allows for multiple regression
-;;; Example: Given a list of x values and y values:
-;;;
-;;; (define xs (range 100))
-;;; (define ys (map + xs (sample (normal-dist 0 30) 100)))
-;;; (let* ([coef (linear-regression xs ys)]
-;;;        [slope (car coef)]
-;;;        [intercept (cadr coef)])
-;;;   (plot (list (points (map vector xs ys))
-;;; 	      (function (λ (x) (+ (* x slope) intercept))))))
-;; (define (linear-regression xs ys)
-;;   (let* ([x-hat (mean xs)]
-;; 	 [y-hat (mean ys)]
-;; 	 [x-devs (map (λ (x) (- x x-hat)) xs)]
-;; 	 [y-devs (map (λ (x) (- x y-hat)) ys)]
-;; 	 [numerator (apply + (map * x-devs y-devs))]
-;; 	 [x-sqr (apply + (map (λ (x) (expt x 2)) x-devs))]
-;; 	 [slope (/ numerator x-sqr)])
-;;     (list slope (- y-hat (* slope x-hat)))))
 
 ;;; End of file data-science.rkt
