@@ -156,13 +156,13 @@ Examples:
 (qq-plot* lst [#:scale? #t])
 ```
 
-Plots sample quantiles against theoretical quantiles from a normal distribution with a mean and standard deviation of the sample `lst`. By default, both sequences of quantiles are z-transformed. Suppress this behavior with #:scale? #f. `qq-plot` produces a plotted figure for quick convenience. `qq-plot*` returns a *renderer* to be used with `plot`, `plot-file`, etc.
+Plots sample quantiles against theoretical quantiles from a normal distribution with a mean and standard deviation of the sample `lst`. By default, both sequences of quantiles are z-transformed. Suppress this behavior with #:scale? #f. `qq-plot` returns a renderer to be used with `plot`, `plot-file`, etc. `qq-plot*`  produces a plotted figure for quick convenience. 
 
 Examples:
 
 ```racket
 ;;; Normal data should plot close to y = x
-(qq-plot (sample (normal-dist 0 1) 500))
+(qq-plot* (sample (normal-dist 0 1) 500))
 ```
 
 ![Q-Q Plot](https://github.com/n3mo/data-science/raw/master/img/qq-plot-example.png)
@@ -170,17 +170,17 @@ Examples:
 ```racket
 ;;; Non-normal data is visibly non-linear. These data are drawn
 ;;; from a right-skewed gamma distribution
-(qq-plot (sample (gamma-dist 2 2) 500))
+(qq-plot* (sample (gamma-dist 2 2) 500))
 ```
 
 ![Q-Q Plot](https://github.com/n3mo/data-science/raw/master/img/qq-plot-skewed-example.png)
 
 ```racket
-;;; Use qq-plot* to return a renderer. With this, you can exercise 
-;;; manual control
+;;; Use qq-plot to return a renderer. With this, you can exercise 
+;;; manual control with the workflow typical of the plot package
 (parameterize ([point-size 10]
 			   [point-color "blue"])
-  (plot (list (qq-plot* (sample (gamma-dist 2 2) 500))
+  (plot (list (qq-plot (sample (gamma-dist 2 2) 500))
               (function identity #:color "red" #:width 2))
         #:x-label "Theoretical Quantiles"
         #:y-label "Sample Quantiles (n = 500)"))

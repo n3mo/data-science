@@ -141,15 +141,9 @@
 ;;; Q-Q Plot. Plots sample quantiles against theoretical quantiles
 ;;; from a normal distribution with a mean and standard deviation
 ;;; of the sample `lst`. By default, both quantiles are
-;;; z-transformed. Suppress this behavior with #:scale? #f
+;;; z-transformed. Suppress this behavior with #:scale? #f. Returns a
+;;; renderer for use with `plot`, `plot-file`, etc.
 (define (qq-plot lst #:scale? [scale? #t])
-  (plot (qq-plot* lst #:scale? scale?)
-	#:x-label "Theoretical Normal Quantiles"
-	#:y-label "Sample Quantiles"))
-
-;;; Same as qq-plot, but returns a renderer that draws a Q-Q plot. Use
-;;; this if you want control over the rendered figure
-(define (qq-plot* lst #:scale? [scale? #t])
   (let* ([n (length lst)]
 	 [lst-mean (mean lst)]
 	 [lst-stddev (stddev lst)]
@@ -161,6 +155,14 @@
 	 [ys (if scale? (scale lst) lst)])
     (points (map vector (sort-samples < xs)
 		 (sort-samples < ys)))))
+
+;;; Same as qq-plot, but automatically passed the renderer to `plot`
+;;; for quick convenience
+(define (qq-plot* lst #:scale? [scale? #t])
+  (plot (qq-plot lst #:scale? scale?)
+	#:x-label "Theoretical Normal Quantiles"
+	#:y-label "Sample Quantiles"))
+
 
 ;;; Regression solver using linear algebra.
 ;;; Returns '(intercept coefficient-1 coefficient-2 ...)
