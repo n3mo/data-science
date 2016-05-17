@@ -42,12 +42,25 @@ A host of statistical tests and models will be supported, including things such 
 ### Linear Model
 
 ``` racket
-(linear-model xs y)
+(linear-model xs ys)
+```
+``` racket
+(linear-model* xs ys)
 ```
 
-Estimates simple and multiple linear regression for independent variable(s) *xs* and dependent variable *y*. Returns a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*.  For simple linear regression, *xs* should be a single list of observations. For multiple regression, *xs* should be a list-of-lists containing independent variables arranged by "columns". Observed values of the dependent variable should be passed as *y*.
+Estimates simple and multiple linear regression for independent variable(s) *xs* and dependent variable *y*.  For simple linear regression, *xs* should be a single list of observations. For multiple regression, *xs* should be a list-of-lists containing independent variables arranged by "columns". Observed values of the dependent variable should be passed as *y*. 
 
-**TODO: Provide p-value estimates, residuals, etc.**
+`linear-model` returns a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*.
+
+`linear-model*` returns a hash with the following fields
+- X -- Design matrix 
+- Y -- Response vector
+- coef -- a list containing `'(intercept coefficient ...)`, with one coefficient for every independent (predictor) variable in *xs*
+- residuals -- Y-Xβ as a list
+- n -- sample size
+- p -- number of predictors
+- mse -- mean squared error
+- root-mse -- root mean squared error
 
 Example: Simple Linear Regression
 
