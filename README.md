@@ -13,6 +13,24 @@ raco pkg install https://github.com/n3mo/data-science.git
 
 # Usage
 
+## Import/Export
+
+### Read-CSV
+
+```racket
+(read-csv file-path [#:->number? #f
+                     #:header? #t])
+```
+
+Convenience wrapper around `csv->list` and `make-csv-reader` from the *csv-reading* package. Reads a comma-separated-values file located at `file-path`, ignoring lines beginning with the # character. If *#:->number* is #t, `read-csv` attempts to convert the data to numbers, otherwise everything is treated as strings. When *#:header?* is #t, the first line in the input file is assumed to contain column names.
+
+Example:
+
+```racket
+;;; Read a data file, converting to numeric data type
+(define data (read-csv "./my_data_file.csv" #:->number? #t))
+```
+
 ## Split->Apply->Combine
 `data-science` provides a collection of ultility functions for breaking your data into meaningful pieces, applying functions to each piece, and then recombining the results. In fact, the filter/map/apply approach of lisp-like languages is well suited to such tasks. However, with complex analyses, commands can grow quite complex and cumbersome, and can mask their intended purpose. The following functions provide convenient short-hand procedures that aim to be *expressive, yet concise*.
 
