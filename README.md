@@ -46,12 +46,19 @@ Examples:
 
 ``` racket
 ;;; Numerical indexing
-(define my-data '((1 2 3) (4 5 6) (7 8 9) (10 11 12)))
+(define my-data '((1 2 3) 
+                  (4 5 6) 
+                  (7 8 9) 
+                  (10 11 12)))
 ($ my-data 0)
 ;; --> '(1 4 7 10)
 
 ;;; Indexing by name
-(define my-data '((age rank id) (21 1 100) (18 2 101) (32 1 102) (19 4 103)))
+(define my-data '((age rank id) 
+                  (21 1 100) 
+                  (18 2 101) 
+                  (32 1 102) 
+                  (19 4 103)))
 ($ my-data 'rank)
 ;; --> '(1 2 1 4)
 ```
