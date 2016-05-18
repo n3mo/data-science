@@ -176,6 +176,25 @@ Examples:
 ;; --> '(1 2 1 4)
 ```
 
+### Group-With
+
+```racket
+(group-with factors lst [include-factors? #t])
+```
+
+Similar to `group-by`, but accepts two *ordered* lists: `factors` and `lst`. The elements of `lst` are grouped into sub-lists according to the grouping factors in `factors`. Returns a list of lists, with one list per element in `factors`. If *include-factors?* is #t, the grouping element from `factors` is included first in each sub-list, enabling the returned lists to be accessed as an associate list.
+
+Examples:
+
+```racket
+(group-with '(A B A B A B A B) '(1 2 3 4 5 6 7 8))
+;; --> '((A 1 3 5 7) (B 2 4 6 8))
+
+;;; Or, with no factors returned:
+(group-with '(A B A B A B A B) '(1 2 3 4 5 6 7 8) #f)
+;; --> '((1 3 5 7) (2 4 6 8))
+```
+
 ## Plotting Functions
 
 ### Histogram of Sorted Counts
