@@ -55,8 +55,21 @@
 ;;; This provides subsetting of data based on the value of a given
 ;;; column. To subset based on name, create a name-idx alist and then
 ;;; use (aref idx lst) in place of "col"
-(define (cidx lsts col val)
-  (filter (lambda (x) (equal? (list-ref x col) val)) lsts))
+(define (subset lst index f)
+  (if (number? index)
+      (if (or (< index 0) (>= index (length (car lst))))
+	  (error "Invalid column number")
+	  (filter (lambda (x) (f (list-ref x index))) lst))
+   (let* ([header (car lst)]
+	  [fn (cond
+	       [(string? (car header)) string->symbol]
+	       [(symbol? (car header)) identity]
+	       [else (error "Header must be of type string or symbol")])])
+     (let* ([header-index (map list (map fn header) (range (length header)))]
+	    [name (aref index header-index)])
+       (if name
+	   (cons (car lst) (filter (lambda (x) (f (list-ref x name))) (cdr lst)))
+	   (error "Invalid column name"))))))
 
 ;;; Uninformative (i.e., bad) name for a function that allows you to
 ;;; extract columns from columnar data (list-of-lists). The short
