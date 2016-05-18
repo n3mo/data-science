@@ -123,6 +123,70 @@ Examples:
 
 Data in `lst` are counted and sorted into a list of observed frequencies. Returns a list-of-lists suitable for passing to `discrete-histogram`. In fact, `hist` and `hist*` call `sorted-counts` to tabulate data prior to plotting. 
 
+### Subset
+
+```racket
+(subset lst index f)
+```
+
+Returns (filters) a subset of data from a list-of-lists *lst*. Column selection is controlled by *index,* which can be either a number or a symbol. If *index* is a number, data from the corresponding column is used. If *index* is a symbol, then the first row of *lst* is assumed to be a header containing named fields of each column. In this situation, data from the corresponding column of data identified by the column name is used, *excluding the first row*--that is, the header row is not subjected to filtering, and is returned un-touched as part of the returned subset. In either case, the values from the indexed column are filtered via the function *f*, which is a 1-parameter function that must return a boolean value. The returned value is a list-of-lists wherein the values in column *index* are #t according to *f*.
+
+Examples:
+
+```racket
+;;; Sleep data involving the effect of two drugs on 10 
+;;; participant's sleep. Data taken from:
+;;; Cushny, A. R. and Peebles, A. R. (1905) The action of optical
+;;;    isomers: II hyoscines.  The Journal of Physiology 32, 501-510.
+(define sleep '((extra group ID)
+                (0.7   1     1)
+                (-1.6  1     2)
+                (-0.2  1     3)
+                (-1.2  1     4)
+                (-0.1  1     5)
+                (3.4   1     6)
+                (3.7   1     7)
+                (0.8   1     8)
+                (0.0   1     9)
+                (2.0   1    10)
+                (1.9   2     1)
+                (0.8   2     2)
+                (1.1   2     3)
+                (0.1   2     4)
+                (-0.1  2     5)
+                (4.4   2     6)
+                (5.5   2     7)
+                (1.6   2     8)
+                (4.6   2     9)
+                (3.4   2    10)))
+				
+;;; If we only want to look at data from group 1 (drug #1), we can 
+;;; subset that portion of the data set out.
+(subset sleep 'group (λ (x) (equal? x 1)))
+;; --> '((extra group ID)
+         (0.7   1     1)
+         (-1.6  1     2)
+         (-0.2  1     3)
+         (-1.2  1     4)
+         (-0.1  1     5)
+         (3.4   1     6)
+         (3.7   1     7)
+         (0.8   1     8)
+         (0.0   1     9)
+         (2.0   1    10))
+		 
+;;; Combined with the `$` function, we can easily calculate the
+;;; mean change in sleep for cond 1
+(mean ($ (subset sleep 'group (λ (x) (equal? x 1))) 'extra))
+;; --> 0.75
+
+;;; Of course, for common practices such as the above example,
+;;; consider using the `aggregate` function:
+(aggregate mean ($ sleep 'group) ($ sleep 'extra))
+;; --> '((1 0.75) (2 2.33))
+```
+
+
 ## General Utilities
 
 ### z-transform data (Scale)
