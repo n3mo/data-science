@@ -228,6 +228,14 @@ Examples:
 ;; --> '((A (4 6 6 9 4)) (B (2 3 2 5 8 4)))
 ```
 
+### Sorted-Counts
+
+```racket
+(sorted-counts lst)
+```
+
+Data in `lst` are counted and sorted into a list of observed frequencies. Returns a list-of-lists suitable for passing to `discrete-histogram`. In fact, `hist` and `hist*` call `sorted-counts` to tabulate data prior to plotting. 
+
 ## Plotting Functions
 
 ### Histogram of Sorted Counts
@@ -239,7 +247,7 @@ Examples:
 (hist* lst)
 ```
 
-Generating discrete histograms of sorted observed frequencies in a sample requires several unnecessarily unwieldy steps. This should be easier. Now it is. `hist` returns a renderer that produces a sorted, discrete histogram of observed frequencies. `hist*` plots the renderer for you for convenience.
+Generating discrete histograms of sorted observed frequencies in a sample requires several unnecessarily unwieldy steps. This should be easier. Now it is. `hist` returns a renderer that produces a sorted, discrete histogram of observed frequencies. `hist*` plots the renderer for you for convenience. Both functions use `sorted-counts` to sort and group the data.
 
 Examples:
 
