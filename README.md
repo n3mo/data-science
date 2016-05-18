@@ -13,6 +13,91 @@ raco pkg install https://github.com/n3mo/data-science.git
 
 # Usage
 
+## Split->Apply->Combine
+`data-science` provides a collection of ultility functions for breaking your data into meaningful pieces, applying functions to each piece, and then recombining the results. In fact, the filter/map/apply approach of lisp-like languages is well suited to such tasks. However, with complex analyses, commands can grow quite complex and cumbersome, and can mask their intended purpose. The following functions provide convenient short-hand procedures that aim to be *expressive, yet concise*.
+
+### $ (Column-indexing)
+
+``` racket
+($ lst index)
+```
+
+Returns a "column" of data from a list-of-lists *lst*. Column selection is controlled by *index,* which can be either a number or a symbol. If *index* is a number, the corresponding column is returned from all rows of *lst*. If *index* is a symbol, then the first row of *lst* is assumed to be a header containing named fields of each column. In this situation, $ returns the corresponding column of data identified by the column name, *excluding the first row*--that is, the header name is **not** part of the return value.
+
+Examples:
+
+``` racket
+;;; Numerical indexing
+(define my-data '((1 2 3) (4 5 6) (7 8 9) (10 11 12)))
+($ my-data 0)
+;; --> '(1 4 7 10)
+
+;;; Indexing by name
+(define my-data '((age rank id) (21 1 100) (18 2 101) (32 1 102) (19 4 103)))
+($ my-data 'rank)
+;; --> '(1 2 1 4)
+```
+
+### Aggregate
+
+```racket
+(aggregate f factors lst)
+```
+
+`aggregate` applies function `f` to the elements of `lst`, as grouped by `factors`. Essentially, `aggregate` groups the data using the function `group-with` (see documentation for full details), and applies the function `f` to each grouping.
+
+Examples:
+
+```racket
+;;; Say that we have responses from two experimental conditions, 
+;;; "A" and "B," and we want to know about these two groups separately. 
+
+;;; Our condition factors
+(define condition '(A A A B B B B B B A A))
+
+;;; Our response data
+(define response '(3 5 5 1 2 1 4 7 3 8 3))
+
+;;; How many observations from each condition?
+(aggregate length condition response)
+;; --> '((A 5) (B 6))
+
+;;; What's the mean response from each condition?
+(aggregate mean condition response)
+;; --> '((A 24/5) (B 3))
+
+;;; Let's add 1 to each response from each condition
+(aggregate (λ (x) (map add1 x)) condition response)
+;; --> '((A (4 6 6 9 4)) (B (2 3 2 5 8 4)))
+```
+
+### Group-With
+
+```racket
+(group-with factors lst [include-factors? #t])
+```
+
+Similar to `group-by`, but accepts two *ordered* lists: `factors` and `lst`. The elements of `lst` are grouped into sub-lists according to the grouping factors in `factors`. Returns a list of lists, with one list per element in `factors`. If *include-factors?* is #t, the grouping element from `factors` is included first in each sub-list, enabling the returned lists to be accessed as an associate list.
+
+Examples:
+
+```racket
+(group-with '(A B A B A B A B) '(1 2 3 4 5 6 7 8))
+;; --> '((A 1 3 5 7) (B 2 4 6 8))
+
+;;; Or, with no factors returned:
+(group-with '(A B A B A B A B) '(1 2 3 4 5 6 7 8) #f)
+;; --> '((1 3 5 7) (2 4 6 8))
+```
+
+### Sorted-Counts
+
+```racket
+(sorted-counts lst)
+```
+
+Data in `lst` are counted and sorted into a list of observed frequencies. Returns a list-of-lists suitable for passing to `discrete-histogram`. In fact, `hist` and `hist*` call `sorted-counts` to tabulate data prior to plotting. 
+
 ## General Utilities
 
 ### z-transform data (Scale)
@@ -150,91 +235,6 @@ Example: Multiple Linear Regression With Interactions. Individual predictors rep
 ;; --> '(11.348195769005791 1.1439038728897226 0.4453766612762809 -0.0015873927901779573)
 
 ```
-
-## Split->Apply->Combine
-`data-science` provides a collection of ultility functions for breaking your data into meaningful pieces, applying functions to each piece, and then recombining the results. In fact, the filter/map/apply approach of lisp-like languages is well suited to such tasks. However, with complex analyses, commands can grow quite complex and cumbersome, and can mask their intended purpose. The following functions provide convenient short-hand procedures that aim to be *expressive, yet concise*.
-
-### $ (Column-indexing)
-
-``` racket
-($ lst index)
-```
-
-Returns a "column" of data from a list-of-lists *lst*. Column selection is controlled by *index,* which can be either a number or a symbol. If *index* is a number, the corresponding column is returned from all rows of *lst*. If *index* is a symbol, then the first row of *lst* is assumed to be a header containing named fields of each column. In this situation, $ returns the corresponding column of data identified by the column name, *excluding the first row*--that is, the header name is **not** part of the return value.
-
-Examples:
-
-``` racket
-;;; Numerical indexing
-(define my-data '((1 2 3) (4 5 6) (7 8 9) (10 11 12)))
-($ my-data 0)
-;; --> '(1 4 7 10)
-
-;;; Indexing by name
-(define my-data '((age rank id) (21 1 100) (18 2 101) (32 1 102) (19 4 103)))
-($ my-data 'rank)
-;; --> '(1 2 1 4)
-```
-
-### Group-With
-
-```racket
-(group-with factors lst [include-factors? #t])
-```
-
-Similar to `group-by`, but accepts two *ordered* lists: `factors` and `lst`. The elements of `lst` are grouped into sub-lists according to the grouping factors in `factors`. Returns a list of lists, with one list per element in `factors`. If *include-factors?* is #t, the grouping element from `factors` is included first in each sub-list, enabling the returned lists to be accessed as an associate list.
-
-Examples:
-
-```racket
-(group-with '(A B A B A B A B) '(1 2 3 4 5 6 7 8))
-;; --> '((A 1 3 5 7) (B 2 4 6 8))
-
-;;; Or, with no factors returned:
-(group-with '(A B A B A B A B) '(1 2 3 4 5 6 7 8) #f)
-;; --> '((1 3 5 7) (2 4 6 8))
-```
-
-### Aggregate
-
-```racket
-(aggregate f factors lst)
-```
-
-`aggregate` applies function `f` to the elements of `lst`, as grouped by `factors`. Essentially, `aggregate` groups the data using the function `group-with` (see documentation for full details), and applies the function `f` to each grouping.
-
-Examples:
-
-```racket
-;;; Say that we have responses from two experimental conditions, 
-;;; "A" and "B," and we want to know about these two groups separately. 
-
-;;; Our condition factors
-(define condition '(A A A B B B B B B A A))
-
-;;; Our response data
-(define response '(3 5 5 1 2 1 4 7 3 8 3))
-
-;;; How many observations from each condition?
-(aggregate length condition response)
-;; --> '((A 5) (B 6))
-
-;;; What's the mean response from each condition?
-(aggregate mean condition response)
-;; --> '((A 24/5) (B 3))
-
-;;; Let's add 1 to each response from each condition
-(aggregate (λ (x) (map add1 x)) condition response)
-;; --> '((A (4 6 6 9 4)) (B (2 3 2 5 8 4)))
-```
-
-### Sorted-Counts
-
-```racket
-(sorted-counts lst)
-```
-
-Data in `lst` are counted and sorted into a list of observed frequencies. Returns a list-of-lists suitable for passing to `discrete-histogram`. In fact, `hist` and `hist*` call `sorted-counts` to tabulate data prior to plotting. 
 
 ## Plotting Functions
 
