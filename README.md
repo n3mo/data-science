@@ -195,6 +195,39 @@ Examples:
 ;; --> '((1 3 5 7) (2 4 6 8))
 ```
 
+### Aggregate
+
+```racket
+(aggregate f factors lst)
+```
+
+`aggregate` applies function `f` to the elements of `lst`, as grouped by `factors`. Essentially, `aggregate` groups the data using the function `group-with` (see documentation for full details), and applies the function `f` to each grouping.
+
+Examples:
+
+```racket
+;;; Say that we have responses from two experimental conditions, 
+;;; "A" and "B," and we want to know about these two groups separately. 
+
+;;; Our condition factors
+(define condition '(A A A B B B B B B A A))
+
+;;; Our response data
+(define response '(3 5 5 1 2 1 4 7 3 8 3))
+
+;;; How many observations from each condition?
+(aggregate length condition response)
+;; --> '((A 5) (B 6))
+
+;;; What's the mean response from each condition?
+(aggregate mean condition response)
+;; --> '((A 24/5) (B 3))
+
+;;; Let's add 1 to each response from each condition
+(aggregate (λ (x) (map add1 x)) condition response)
+;; --> '((A (4 6 6 9 4)) (B (2 3 2 5 8 4)))
+```
+
 ## Plotting Functions
 
 ### Histogram of Sorted Counts
