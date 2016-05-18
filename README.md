@@ -178,6 +178,41 @@ Examples:
 
 ## Plotting Functions
 
+### Histogram of Sorted Counts
+
+```racket
+(hist lst)
+```
+```racket
+(hist* lst)
+```
+
+Generating discrete histograms of sorted observed frequencies in a sample requires several unnecessarily unwieldy steps. This should be easier. Now it is. `hist` returns a renderer that produces a sorted, discrete histogram of observed frequencies. `hist*` plots the renderer for you for convenience.
+
+Examples:
+
+```racket
+;;; If we roll two dice in a board game, what are the most
+;;; frequent totals? Let's simulate rolling 500 pairs of dice
+(define die-1 (build-list 500 (λ (n) (random 1 7))))
+(define die-2 (build-list 500 (λ (n) (random 1 7))))
+(define total-roll (map + die-1 die-2))
+
+;;; Aha... this is why we get robbed so often in Settlers of Catan!
+(hist* total-roll)
+```
+
+![Hist Plot](https://github.com/n3mo/data-science/raw/master/img/hist-example.png)
+
+```racket
+;;; We can generate the same hist figure above manually, exercising
+;;; some control over the plot details. Let's make an ugly green histogram 
+(parameterize ([rectangle-color "lightgreen"]) 
+  (plot (hist total-roll)
+        #:x-label "Dice Roll"
+        #:y-label "Frequency"))
+```
+
 ### Quantile-Quantile (Q-Q) Plot
 
 ```racket
@@ -204,7 +239,7 @@ Examples:
 (qq-plot* (sample (gamma-dist 2 2) 500))
 ```
 
-![Q-Q Plot](https://github.com/n3mo/data-science/raw/master/img/qq-plot-skewed-example.png)
+![Q-Q Skewed Plot](https://github.com/n3mo/data-science/raw/master/img/qq-plot-skewed-example.png)
 
 ```racket
 ;;; Use qq-plot to return a renderer. With this, you can exercise 
@@ -217,7 +252,7 @@ Examples:
         #:y-label "Sample Quantiles (n = 500)"))
 ```
 
-![Q-Q Plot](https://github.com/n3mo/data-science/raw/master/img/qq-manual-example.png)
+![Q-Q Manual Plot](https://github.com/n3mo/data-science/raw/master/img/qq-manual-example.png)
 
 # License
 

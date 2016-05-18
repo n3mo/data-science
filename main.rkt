@@ -122,7 +122,14 @@
 ;;; styling, call `sorted-counts` manually and pass the result to
 ;;; `discrete-histogram` yourself.
 (define (hist lst)
-  (plot (discrete-histogram (sorted-counts lst))))
+  (discrete-histogram (sorted-counts lst)))
+
+;;; Same as hist, but automatically passed the renderer to `plot`
+;;; for quick convenience
+(define (hist* lst)
+  (plot (hist lst)
+	#:x-label "Value"
+	#:y-label "Frequency"))
 
 ;;; When you have a single list of values, it is useful to be able to
 ;;; plot the data as y-values. This requires creating token x values
