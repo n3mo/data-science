@@ -189,6 +189,31 @@ Examples:
 
 ## General Utilities
 
+### Singular Value Decomposition (1-Dimensional)
+
+```racket
+(svd-1d A [epsilon 1e-10])
+```
+
+Estimates the 1-dimensional singular value decomposition for matrix *A*, stopping when the magnitude between the current and previous estimates (i.e., the cosine of the angle between them) is close to 1 (1 - *epsilon*). `svd-1d` uses the "Power Method" and so can take a long time to converge when the ratio between singular values is close to 1. 
+
+Example:
+
+```racket
+;;; Some data
+(define my-matrix (matrix [[2 5 3] 
+                           [1 2 1] 
+                           [4 1 1] 
+                           [3 5 2] 
+                           [5 3 1] 
+                           [4 5 5] 
+                           [2 4 2] 
+                           [2 2 5]]))
+
+(svd-1d my-matrix)
+;; --> (array #[#[-0.5418477730068635] #[-0.6707099886151974] #[-0.5065067640805049]])
+```
+
 ### z-transform data (Scale)
 
 ```racket
