@@ -257,4 +257,22 @@
 	    'mse mse
 	    'root-mse root-mse))))
 
+;;; One-dimensional singular value decomposition using the "Power
+;;; Method". This is used by `svd` to estimate a full singular value
+;;; decomposition. Input `A` should be a matrix.
+(define (svd-1d A [epsilon 1e-10])
+  (let* ([threshold (- 1 epsilon)]
+	 [m (matrix-num-cols A)]
+	 [rand-norm (sample (normal-dist) m)]
+	 [x-norm (sqrt (apply + (map sqr rand-norm)))]
+	 [initial-vector (->col-matrix (map (λ (x) (/ x x-norm)) rand-norm))]
+	 [B (matrix* (matrix-transpose A) A)])
+    (let loop ([previous-v initial-vector])
+      (let* ([pre-norm-current (matrix* B previous-v)]
+	     [norm-div (make-matrix m 1 (matrix-norm pre-norm-current))]
+	     [current-v (matrix-map / pre-norm-current norm-div)])
+	(if (> (matrix-dot current-v previous-v) threshold)
+	    current-v
+	    (loop current-v))))))
+
 ;;; End of file data-science.rkt
