@@ -275,4 +275,61 @@
 	    current-v
 	    (loop current-v))))))
 
+;;; SENTIMENT ANALYSIS TOOLS
+
+;;; Sentiment lexicons
+(define nrc (with-input-from-file "./lexicons/nrc-lexicon" (λ () (read))))
+(define bing (with-input-from-file "./lexicons/bing-lexicon" (λ () (read))))
+(define AFINN (with-input-from-file "./lexicons/AFINN-lexicon" (λ () (read))))
+
+;;; Convert text string into a list-of-lists counting the number of
+;;; occurences for each token/word. 
+(define (document->tokens str #:sort? [sort? #f])
+  (let-values ([(x y) (count-samples (string-split str))])
+    (if sort?
+	(sort (map list x y) (λ (x y) (> (second x) (second y))))
+	(map list x y))))
+
+;;; Convert a token/word into a sentiment score. Lexicon can be either
+;;;   (1) 'nrc   : returns emotional labels
+;;;   (2) 'bing  : returns "positive" or "negative"
+;;;   (3) 'AFINN : returns a -4 to +4 numerical score
+(define (token->sentiment token #:lexicon [lexicon 'nrc])
+  (cond [(equal? lexicon 'nrc)
+	 (hash-ref nrc token #f)]
+	[(equal? lexicon 'bing)
+	 (hash-ref bing token #f)]
+	[else
+	 (hash-ref AFINN token 0)]))
+
+;;; Takes as input a list of pairs of the type (string number), such
+;;; as output by document->tokens where string is a word from a text
+;;; and number is the number of times it occurs in the
+;;; document. Lexicon can be either
+;;;   (1) 'nrc   : returns emotional labels
+;;;   (2) 'bing  : returns "positive" or "negative"
+;;;   (3) 'AFINN : returns a -4 to +4 numerical score
+(define (list->sentiment lst #:lexicon [lexicon 'nrc])
+  (map (λ (x) (token->sentiment (first x) #:lexicon lexicon)) lst))
+
+;;; Example workflow:
+;;; Read a document from file into a string:
+;;;    (define doc (file->string "my-file.txt"))
+;;; Count number of each token/word
+;;;    (define words (document->tokens doc #:sort? #t))
+;;; Determine total sentiment score
+;;;    (apply + (list-sentiment words #:lexicon 'AFINN))
+;;;
+;;; OR, count positive/negative occurences
+;;;   (sorted-counts (filter (λ (x) x) (list-sentiment words #:lexicon 'bing)))
+;;; or plot the breakdown
+;;;   (plot (discrete-histogram
+;;;       (sorted-counts (filter (λ (x) x) (list-sentiment words #:lexicon 'bing)))))
+;;;
+;;; OR plot breakdown of emotional labels using nrc lexicon
+;;;     (parameterize ((plot-width 800))
+;;;       (plot (discrete-histogram
+;;;           (sorted-counts (filter (λ (x) x) (list-sentiment cthul #:lexicon 'nrc))))))
+
 ;;; End of file data-science.rkt
+
