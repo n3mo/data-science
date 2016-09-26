@@ -7,11 +7,11 @@ Many functions contained within are inspired by functionality commonly available
 # Table of Contents
 
 - [Installation](#installation)
-- [Data Import/Export](#import/export)
+- [Data Import/Export](#importexport)
  - [CSV Reading](#read-csv)
-- [Split -> Apply -> Combine Workflows](#split->apply->combine)
+- [Split -> Apply -> Combine Workflows](#split-apply-combine)
  - [Column Indexing](#-column-indexing)
- - [Aggregate](#aggregrate)
+ - [Aggregate](#aggregate)
  - [Grouping Data](#group-with)
  - [Counting Samples](#sorted-counts)
  - [Subsetting Data](#subset)
