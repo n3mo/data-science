@@ -319,18 +319,18 @@
 ;;; Count number of each token/word
 ;;;    (define words (document->tokens doc #:sort? #t))
 ;;; Determine total sentiment score
-;;;    (apply + (list-sentiment words #:lexicon 'AFINN))
+;;;    (apply + (list->sentiment words #:lexicon 'AFINN))
 ;;;
 ;;; OR, count positive/negative occurences
-;;;   (sorted-counts (filter (λ (x) x) (list-sentiment words #:lexicon 'bing)))
+;;;   (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'bing)))
 ;;; or plot the breakdown
 ;;;   (plot (discrete-histogram
-;;;       (sorted-counts (filter (λ (x) x) (list-sentiment words #:lexicon 'bing)))))
+;;;       (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'bing)))))
 ;;;
 ;;; OR plot breakdown of emotional labels using nrc lexicon
 ;;;     (parameterize ((plot-width 800))
 ;;;       (plot (discrete-histogram
-;;;           (sorted-counts (filter (λ (x) x) (list-sentiment cthul #:lexicon 'nrc))))))
+;;;           (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'nrc))))))
 
 ;;; End of file data-science.rkt
 
