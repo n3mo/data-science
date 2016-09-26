@@ -20,6 +20,11 @@ Many functions contained within are inspired by functionality commonly available
  - [Data scaling: Z-transformation](#z-transform-data-scale)
 - [Statistical Tests/Models](#statistical-tests-and-models)
  - [Linear Regression Models](#linear-model)
+- [Text Processing](#text-processing)
+ -[Sentiment Analysis](#sentiment-analysis)
+  -[Tokenizing Documents](#document-tokens)
+  -[Token/word sentiment](#token-sentiment)
+  -[Document Sentiment](#list->sentiment)
 - [Plotting Utilities](#plotting-functions)
  - [Frequency Histograms](#histogram-of-sorted-counts)
  - [Quantile-Quantile (Q-Q) Plot](#quantile-quantile-q-q-plot)
@@ -371,6 +376,68 @@ Example: Multiple Linear Regression With Interactions. Individual predictors rep
 ;; --> '(11.348195769005791 1.1439038728897226 0.4453766612762809 -0.0015873927901779573)
 
 ```
+
+# Text Processing
+
+## Sentiment Analysis
+
+Sentiment analysis is commonly used to quickly determine the mood, or emotional valence of a body of text. The `data-science` package offers sentiment analysis via three different lexicons
+
+- nrc lexicon
+- bing lexicon
+- AFINN lexicon
+
+Individual functions, documented below, offer fine-grained control over analysis options. The following analysis provides an example workflow for accomplishing a sentiment analysis with this package.
+
+```racket
+;;; We'll use Racket's net/url package to obtain our text,
+;;; data-science to process the text, and plot to visualize the
+;;; results 
+(require net/url)
+(require data-science)
+(require plot)
+
+;;; We'll use the text of Alice in Wonderland, available for free
+;;; on Project Gutenberg
+(define alice (string->url "https://ia801405.us.archive.org/18/items/alicesadventures19033gut/19033.txt"))
+
+;;; Open a connection port to the URL
+(define in (get-pure-port alice #:redirections 5))
+
+;;; Next, we capture the text from our input port
+(define alice-text (port->string in))
+
+;;; Close the input port
+(close-input-port in)
+
+;;; To begin our sentiment analysis, we extract each unique word
+;;; and the number of times it occurred in the document
+(define words (document->tokens alice-text #:sort? #t))
+
+;;; Using the nrc lexicon, we can label each (non stop-word) with an
+;;; emotional label, counting up each occurrence of each label
+(sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'nrc)))
+
+;;; Better yet, we can visualize this result as a barplot (discrete-histogram)
+(parameterize ((plot-width 800))
+  (plot (discrete-histogram
+	 (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'nrc))))))
+
+;;; Or, use the bing lexicon to determine the ratio of
+;;; positive-to-negative words 
+(plot (discrete-histogram
+       (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'bing)))))
+
+;;; Or, use the AFINN lexicon to determine the average sentiment
+;;; positivity/negativity score
+(exact->inexact (mean (list->sentiment words #:lexicon 'AFINN)))
+```
+
+### document->tokens
+
+### token->sentiment
+
+### list->sentiment
 
 ## Plotting Functions
 
