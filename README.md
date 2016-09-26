@@ -1,6 +1,6 @@
 # Data Science Tooling For Racket
 
-This project is a work in progress and is not currently intended to be shared with others. You are, however, welcome to snoop around. Eventually, this will evolve into a package of convenience functions for data science: data cleaning, wrangling, summarizing, and exploration. 
+This project is a work in progress. Documented functions are working, however, and you are welcome to snoop around. Eventually, this will evolve into a package of convenience functions for data science: data cleaning, wrangling, summarizing, and exploration. 
 
 Many functions contained within are inspired by functionality commonly available in more statistically-oriented software packages such as R, numpy/scipy, and Matlab/Octave. This all began because I wanted the R function `aggregate` in Racket.
 
@@ -20,7 +20,7 @@ Many functions contained within are inspired by functionality commonly available
  - [Data scaling: Z-transformation](#z-transform-data-scale)
 - [Statistical Tests/Models](#statistical-tests-and-models)
  - [Linear Regression Models](#linear-model)
-- [Plotting Functions](#plotting-functions)
+- [Plotting Utilities](#plotting-functions)
  - [Frequency Histograms](#histogram-of-sorted-counts)
  - [Quantile-Quantile (Q-Q) Plot](#quantile-quantile-q-q-plot)
 - [Bugs and Improvements](#bugs--improvements)
