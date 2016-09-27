@@ -9,7 +9,7 @@
 (require csv-reading math math/matrix plot)
 (provide aref read-csv ci subset $ group-with aggregate sorted-counts
 	 hist xs linear-model document->tokens token->sentiment
-	 list->sentiment)
+	 list->sentiment remove-punctuation)
 
 ;;; Can't live without alist-ref from Chicken scheme. Let's recreate
 ;;; it here, but with a shorter name
@@ -275,6 +275,12 @@
 	(if (> (matrix-dot current-v previous-v) threshold)
 	    current-v
 	    (loop current-v))))))
+
+;;; TEXT ANALYSIS TOOLS
+
+;;; Remove punctuation in a string
+(define (remove-punctuation str)
+  (regexp-replace* #px"\\P{Ll}" str " "))
 
 ;;; SENTIMENT ANALYSIS TOOLS
 
