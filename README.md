@@ -431,7 +431,7 @@ Individual functions, documented below, offer fine-grained control over analysis
 	#:y-label "Frequency"))
 ```
 
-![Affective Sentiment Lables](https://github.com/n3mo/data-science/raw/master/img/sentiment-labels.png)
+![Affective Sentiment Labels](https://github.com/n3mo/data-science/raw/master/img/sentiment-labels.png)
 
 ```racket
 ;;; Or, use the bing lexicon to determine the ratio of
