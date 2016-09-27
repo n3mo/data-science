@@ -404,9 +404,12 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;; Open a connection port to the URL
 (define in (get-pure-port alice #:redirections 5))
 
-;;; Next, we capture the text from our input port
-(define alice-text (port->string in))
-
+;;; Next, we capture the text from our input port, removing capitalization, 
+;;; punctuation, and then extra spaces
+(define alice-text (string-normalize-spaces
+                    (remove-punctuation
+                     (string-downcase (port->string in)))))
+			 
 ;;; Close the input port
 (close-input-port in)
 
@@ -420,17 +423,31 @@ Individual functions, documented below, offer fine-grained control over analysis
 
 ;;; Better yet, we can visualize this result as a barplot (discrete-histogram)
 (parameterize ((plot-width 800))
-  (plot (discrete-histogram
-	 (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'nrc))))))
+  (plot (list
+	 (tick-grid)
+	 (discrete-histogram
+	  (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'nrc)))))
+	#:x-label "Affective Label"
+	#:y-label "Frequency"))
+```
 
+![Affective Sentiment Lables](https://github.com/n3mo/data-science/raw/master/img/sentiment-labels.png)
+
+```racket
 ;;; Or, use the bing lexicon to determine the ratio of
 ;;; positive-to-negative words 
 (plot (discrete-histogram
-       (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'bing)))))
+       (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'bing))))
+      #:x-label "Sentiment Polarity"
+      #:y-label "Frequency")
+```
 
-;;; Or, use the AFINN lexicon to determine the average sentiment
-;;; positivity/negativity score
-(exact->inexact (mean (list->sentiment words #:lexicon 'AFINN)))
+![Sentiment Polarity](https://github.com/n3mo/data-science/raw/master/img/sentiment-positivity.png)
+
+```racket
+;;; Or, use the AFINN lexicon to determine the document's
+;;; affective polarity
+(apply + (list->sentiment words #:lexicon 'AFINN))
 ```
 
 ### document->tokens
