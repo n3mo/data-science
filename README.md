@@ -448,6 +448,7 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;; Or, use the AFINN lexicon to determine the document's
 ;;; affective polarity
 (apply + (list->sentiment words #:lexicon 'AFINN))
+;;; --> -62
 ```
 
 ### document->tokens
