@@ -21,6 +21,8 @@ Many functions contained within are inspired by functionality commonly available
 - [Statistical Tests/Models](#statistical-tests-and-models)
  - [Linear Regression Models](#linear-model)
 - [Text Processing](#text-processing)
+ -[General Text Processing Tools](#text-processing-tools)
+  -[Punctuation Removal](#remove-punctuation)
  -[Sentiment Analysis](#sentiment-analysis)
   -[Tokenizing Documents](#document-tokens)
   -[Token/word sentiment](#token-sentiment)
@@ -378,6 +380,23 @@ Example: Multiple Linear Regression With Interactions. Individual predictors rep
 ```
 
 # Text Processing
+
+## Text Processing Tools
+
+### remove-punctuation
+
+```racket
+(remove-punctuation str)
+```
+
+Returns a copy of string `str` with punctuation removed.
+
+Examples:
+
+```racket
+(remove-punctuation "hey, this sentence-which is great-has too; much punctuation!.?")
+;;; --> "hey  this sentence which is great has too  much punctuation   "
+```
 
 ## Sentiment Analysis
 
