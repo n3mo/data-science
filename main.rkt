@@ -317,7 +317,9 @@
 ;;;   (2) 'bing  : returns "positive" or "negative"
 ;;;   (3) 'AFINN : returns a -4 to +4 numerical score
 (define (list->sentiment lst #:lexicon [lexicon 'nrc])
-  (map (λ (x) (token->sentiment (first x) #:lexicon lexicon)) lst))
+  (map (λ (x) (list
+	       (token->sentiment (first x) #:lexicon lexicon)
+	       (second x))) lst))
 
 ;;; Example workflow:
 ;;; Read a document from file into a string:
