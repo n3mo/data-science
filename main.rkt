@@ -318,6 +318,7 @@
 ;;;   (3) 'AFINN : returns a -4 to +4 numerical score
 (define (list->sentiment lst #:lexicon [lexicon 'nrc])
   (map (λ (x) (list
+	       (first x)
 	       (token->sentiment (first x) #:lexicon lexicon)
 	       (second x))) lst))
 
