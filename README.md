@@ -435,24 +435,30 @@ Individual functions, documented below, offer fine-grained control over analysis
 (define words (document->tokens alice-text #:sort? #t))
 
 ;;; Using the nrc lexicon, we can label each (non stop-word) with an
-;;; emotional label, counting up each occurrence of each label
-(sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'nrc)))
-;;; --> '(("anger" 3)
-;;;       ("anticipation" 16)
-;;;       ("disgust" 1)
-;;;       ("fear" 8)
-;;;       ("negative" 80)
-;;;       ("positive" 103)
-;;;       ("sadness" 66)
-;;;       ("surprise" 33)
-;;;       ("trust" 105))
+;;; emotional label. The call to filter is used to remove tokens with no 
+;;; sentiment score (returned as #f)
+(define sentiment (filter (λ (x) (first x)) (list->sentiment words #:lexicon 'nrc)))
+
+;;; sentiment, created above, consists of a list of pairs of the pattern
+;;; ("sentiment" freq) for each token in the document. Many words will have the
+;;; same sentiment label, so we aggregrate (by summing) across such tokens.
+(aggregate sum (map first sentiment) (map second sentiment))
+;;; --> '(("positive" 322)
+;;;       ("trust" 307)
+;;;       ("anticipation" 81)
+;;;       ("negative" 171)
+;;;       ("surprise" 65)
+;;;       ("sadness" 128)
+;;;       ("fear" 23)
+;;;       ("anger" 4)
+;;;       ("disgust" 1))
 
 ;;; Better yet, we can visualize this result as a barplot (discrete-histogram)
 (parameterize ((plot-width 800))
   (plot (list
 	 (tick-grid)
 	 (discrete-histogram
-	  (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'nrc)))))
+	  (aggregate sum (map first sentiment) (map second sentiment))))
 	#:x-label "Affective Label"
 	#:y-label "Frequency"))
 ```
@@ -479,9 +485,91 @@ Individual functions, documented below, offer fine-grained control over analysis
 
 ### document->tokens
 
+```racket
+(document->tokens str [#:sort? #f])
+```
+
+For string `str`, returns a list of pairs. Each pair consists of a unique word/token from `str` with its frequency.
+
+Examples:
+
+```racket
+(document->tokens "there there are are two two of of everything everything except except this") 
+;;; --> '(("there" 2)
+;;;       ("are" 2)
+;;;       ("two" 2)
+;;;       ("of" 2)
+;;;       ("everything" 2)
+;;;       ("except" 2)
+;;;       ("this" 1))
+```
+
 ### token->sentiment
 
+```racket
+(token->sentiment token [#:lexicon 'nrc])
+```
+
+For a given word/token `token`, returns its corresponding sentiment value if possible. `#:lexicon` can be the symbols:
+
+- nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or #f if `token` is unknown.
+- bing --> Returns a polarity label from the set (negative positive), or #f if `token` is unknown.
+- AFINN --> Returns a sentiment scores ranging from -4 (very negative) to +4 (very positive), or 0 if `token` is unknown.
+
+Examples:
+
+```racket
+;;; nrc lexicon examples --------------------
+
+(token->sentiment "marriage" #:lexicon 'nrc)
+;;; --> "trust"
+
+(token->sentiment "fire" #:lexicon 'nrc)
+;;; --> "fear"
+
+(token->sentiment "the" #:lexicon 'nrc)
+;;; --> #f
+
+;;; bing lexicon examples --------------------
+
+(token->sentiment "love" #:lexicon 'bing)
+;;; --> "positive"
+
+(token->sentiment "hate" #:lexicon 'bing)
+;;; --> "negative"
+
+(token->sentiment "the" #:lexicon 'bing)
+;;; --> #f
+
+;;; AFINN lexicon examples --------------------
+
+(token->sentiment "love" #:lexicon 'AFINN)
+;;; --> 3
+
+(token->sentiment "cry" #:lexicon 'AFINN)
+;;; --> -1
+
+(token->sentiment "everest" #:lexicon 'AFINN)
+;;; --> 0
+```
+
 ### list->sentiment
+
+```racket
+(list->sentiment lst [#:lexicon 'nrc])
+```
+
+Returns a list of sentiment values for `lst`, which is a list of pairs of words/tokens and their frequency, as returned by `document->tokens`. `#:lexicon` can be the symbols:
+
+- nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or #f if `token` is unknown.
+- bing --> Returns a polarity label from the set (negative positive), or #f if `token` is unknown.
+- AFINN --> Returns a sentiment scores ranging from -4 (very negative) to +4 (very positive), or 0 if `token` is unknown.
+
+Examples:
+
+```racket
+
+```
 
 ## Plotting Functions
 
