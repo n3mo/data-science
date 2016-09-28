@@ -379,9 +379,7 @@ Example: Multiple Linear Regression With Interactions. Individual predictors rep
 
 ```
 
-# Text Processing
-
-## Text Processing Tools
+## Text Processing
 
 ### remove-punctuation
 
