@@ -468,8 +468,9 @@ Individual functions, documented below, offer fine-grained control over analysis
 ```racket
 ;;; Or, use the bing lexicon to determine the ratio of
 ;;; positive-to-negative words 
+(define sentiment (filter (λ (x) (first x)) (list->sentiment words #:lexicon 'bing)))
 (plot (discrete-histogram
-       (sorted-counts (filter (λ (x) x) (list->sentiment words #:lexicon 'bing))))
+       (aggregate sum (map first sentiment) (map second sentiment)))
       #:x-label "Sentiment Polarity"
       #:y-label "Frequency")
 ```
@@ -479,8 +480,9 @@ Individual functions, documented below, offer fine-grained control over analysis
 ```racket
 ;;; Or, use the AFINN lexicon to determine the document's
 ;;; affective polarity
-(apply + (list->sentiment words #:lexicon 'AFINN))
-;;; --> -62
+(define sentiment (filter (λ (x) (first x)) (list->sentiment words #:lexicon 'AFINN)))
+(sum (map (λ (x) (* (first x) (second x))) sentiment))
+;;; --> 92
 ```
 
 ### document->tokens
