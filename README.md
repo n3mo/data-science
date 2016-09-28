@@ -516,7 +516,7 @@ For a given word/token `token`, returns its corresponding sentiment value if pos
 
 - nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or #f if `token` is unknown.
 - bing --> Returns a polarity label from the set (negative positive), or #f if `token` is unknown.
-- AFINN --> Returns a sentiment scores ranging from -4 (very negative) to +4 (very positive), or 0 if `token` is unknown.
+- AFINN --> Returns a sentiment score ranging from -4 (very negative) to +4 (very positive), or 0 if `token` is unknown.
 
 Examples:
 
@@ -565,7 +565,7 @@ Returns a list of sentiment values for `lst`, which is a list of pairs of words/
 
 - nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or #f if `token` is unknown.
 - bing --> Returns a polarity label from the set (negative positive), or #f if `token` is unknown.
-- AFINN --> Returns a sentiment scores ranging from -4 (very negative) to +4 (very positive), or 0 if `token` is unknown.
+- AFINN --> Returns a sentiment score ranging from -4 (very negative) to +4 (very positive), or 0 if `token` is unknown.
 
 Examples:
 
