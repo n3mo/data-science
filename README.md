@@ -570,7 +570,45 @@ Returns a list of sentiment values for `lst`, which is a list of pairs of words/
 Examples:
 
 ```racket
+;;; Turn a document into word frequencies
+(define tokens (document->tokens "happy happy happy love is better than ugly ugly mean old hate"))
+;;; --> '(("happy" 3)
+;;;       ("love" 1)
+;;;       ("is" 1)
+;;;       ("better" 1)
+;;;       ("than" 1)
+;;;       ("ugly" 2)
+;;;       ("mean" 1)
+;;;       ("old" 1)
+;;;       ("hate" 1))
 
+;;; Convert the tokens into sentiment scores using the nrc lexicon
+(list->sentiment tokens #:lexicon 'nrc)
+;;; --> '(("trust" 3)
+;;;       ("positive" 1)
+;;;       (#f 1)
+;;;       (#f 1)
+;;;       (#f 1)
+;;;       ("negative" 2)
+;;;       (#f 1)
+;;;       (#f 1)
+;;;       ("sadness" 1))
+
+;;; Convert the tokens into sentiment scores using the bing lexicon
+(list->sentiment tokens #:lexicon 'bing)
+;;; --> '(("positive" 3)
+;;;       ("positive" 1)
+;;;       (#f 1)
+;;;       ("positive" 1)
+;;;       (#f 1)
+;;;       ("negative" 2)
+;;;       (#f 1)
+;;;       (#f 1)
+;;;       ("negative" 1))
+
+;;; Convert the tokens into sentiment scores using the AFINN lexicon
+(list->sentiment tokens #:lexicon 'AFINN)
+;;; --> '((3 3) (3 1) (0 1) (2 1) (0 1) (-3 2) (0 1) (0 1) (-3 1))
 ```
 
 ## Plotting Functions
