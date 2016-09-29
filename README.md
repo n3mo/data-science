@@ -413,6 +413,7 @@ Individual functions, documented below, offer fine-grained control over analysis
 (require net/url)
 (require data-science)
 (require plot)
+(require math)
 
 ;;; We'll use the text of Alice in Wonderland, available for free
 ;;; on Project Gutenberg
@@ -437,12 +438,20 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;; Using the nrc lexicon, we can label each (non stop-word) with an
 ;;; emotional label. The call to filter is used to remove tokens with no 
 ;;; sentiment score (returned as #f)
-(define sentiment (filter (λ (x) (first x)) (list->sentiment words #:lexicon 'nrc)))
+(define sentiment (filter (λ (x) (second x)) (list->sentiment words #:lexicon 'nrc)))
 
-;;; sentiment, created above, consists of a list of pairs of the pattern
-;;; ("sentiment" freq) for each token in the document. Many words will have the
-;;; same sentiment label, so we aggregrate (by summing) across such tokens.
-(aggregate sum (map first sentiment) (map second sentiment))
+;;; We can take a sneak peak at the data...
+(take sentiment 5)
+;;; --> '(("king" "positive" 25)
+;;;       ("foundation" "positive" 25)
+;;;       ("found" "trust" 24)
+;;;       ("white" "trust" 22)
+;;;       ("time" "anticipation" 22))
+
+;;; sentiment, created above, consists of a list of triplets of the pattern
+;;; (token sentiment freq) for each token in the document. Many words will have 
+;;; the same sentiment label, so we aggregrate (by summing) across such tokens.
+(aggregate sum (map second sentiment) (map third sentiment))
 ;;; --> '(("positive" 322)
 ;;;       ("trust" 307)
 ;;;       ("anticipation" 81)
@@ -458,7 +467,7 @@ Individual functions, documented below, offer fine-grained control over analysis
   (plot (list
 	 (tick-grid)
 	 (discrete-histogram
-	  (aggregate sum (map first sentiment) (map second sentiment))))
+	  (aggregate sum (map second sentiment) (map third sentiment))))
 	#:x-label "Affective Label"
 	#:y-label "Frequency"))
 ```
@@ -468,9 +477,9 @@ Individual functions, documented below, offer fine-grained control over analysis
 ```racket
 ;;; Or, use the bing lexicon to determine the ratio of
 ;;; positive-to-negative words 
-(define sentiment (filter (λ (x) (first x)) (list->sentiment words #:lexicon 'bing)))
+(define sentiment (filter (λ (x) (second x)) (list->sentiment words #:lexicon 'bing)))
 (plot (discrete-histogram
-       (aggregate sum (map first sentiment) (map second sentiment)))
+       (aggregate sum (map second sentiment) (map third sentiment)))
       #:x-label "Sentiment Polarity"
       #:y-label "Frequency")
 ```
@@ -480,8 +489,8 @@ Individual functions, documented below, offer fine-grained control over analysis
 ```racket
 ;;; Or, use the AFINN lexicon to determine the document's
 ;;; affective polarity
-(define sentiment (filter (λ (x) (first x)) (list->sentiment words #:lexicon 'AFINN)))
-(sum (map (λ (x) (* (first x) (second x))) sentiment))
+(define sentiment (filter (λ (x) (second x)) (list->sentiment words #:lexicon 'AFINN)))
+(sum (map (λ (x) (* (second x) (third x))) sentiment))
 ;;; --> 92
 ```
 
@@ -561,7 +570,7 @@ Examples:
 (list->sentiment lst [#:lexicon 'nrc])
 ```
 
-Returns a list of sentiment values for `lst`, which is a list of pairs of words/tokens and their frequency, as returned by `document->tokens`. `#:lexicon` can be the symbols:
+Returns a list of sentiment values for `lst`, which is a list of pairs of words/tokens and their frequency, as returned by `document->tokens`. Returns a list of triplets of the form (token sentiment frequency). `#:lexicon` can be the symbols:
 
 - nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or #f if `token` is unknown.
 - bing --> Returns a polarity label from the set (negative positive), or #f if `token` is unknown.
@@ -584,31 +593,40 @@ Examples:
 
 ;;; Convert the tokens into sentiment scores using the nrc lexicon
 (list->sentiment tokens #:lexicon 'nrc)
-;;; --> '(("trust" 3)
-;;;       ("positive" 1)
-;;;       (#f 1)
-;;;       (#f 1)
-;;;       (#f 1)
-;;;       ("negative" 2)
-;;;       (#f 1)
-;;;       (#f 1)
-;;;       ("sadness" 1))
+;;; --> '(("happy" "trust" 3)
+;;;       ("love" "positive" 1)
+;;;       ("is" #f 1)
+;;;       ("better" #f 1)
+;;;       ("than" #f 1)
+;;;       ("ugly" "negative" 2)
+;;;       ("mean" #f 1)
+;;;       ("old" #f 1)
+;;;       ("hate" "sadness" 1))
 
 ;;; Convert the tokens into sentiment scores using the bing lexicon
 (list->sentiment tokens #:lexicon 'bing)
-;;; --> '(("positive" 3)
-;;;       ("positive" 1)
-;;;       (#f 1)
-;;;       ("positive" 1)
-;;;       (#f 1)
-;;;       ("negative" 2)
-;;;       (#f 1)
-;;;       (#f 1)
-;;;       ("negative" 1))
+;;; --> '(("happy" "positive" 3)
+;;;       ("love" "positive" 1)
+;;;       ("is" #f 1)
+;;;       ("better" "positive" 1)
+;;;       ("than" #f 1)
+;;;       ("ugly" "negative" 2)
+;;;       ("mean" #f 1)
+;;;       ("old" #f 1)
+;;;       ("hate" "negative" 1))
 
 ;;; Convert the tokens into sentiment scores using the AFINN lexicon
 (list->sentiment tokens #:lexicon 'AFINN)
-;;; --> '((3 3) (3 1) (0 1) (2 1) (0 1) (-3 2) (0 1) (0 1) (-3 1))
+;;; --> '(("happy" 3 3)
+;;;       ("love" 3 1)
+;;;       ("is" 0 1)
+;;;       ("better" 2 1)
+;;;       ("than" 0 1)
+;;;       ("ugly" -3 2)
+;;;       ("mean" 0 1)
+;;;       ("old" 0 1)
+;;;       ("hate" -3 1))
+
 ```
 
 ## Plotting Functions
