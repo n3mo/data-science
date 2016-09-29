@@ -415,25 +415,25 @@ Individual functions, documented below, offer fine-grained control over analysis
 (require plot)
 (require math)
 
-;;; We'll use the text of Alice in Wonderland, available for free
+;;; We'll use the text of Moby Dick, available for free
 ;;; on Project Gutenberg
-(define alice (string->url "https://ia801405.us.archive.org/18/items/alicesadventures19033gut/19033.txt"))
+(define moby (string->url "http://www.gutenberg.org/files/2701/2701.txt"))
 
 ;;; Open a connection port to the URL
-(define in (get-pure-port alice #:redirections 5))
+(define in (get-pure-port moby #:redirections 5))
 
 ;;; Next, we capture the text from our input port, removing capitalization, 
 ;;; punctuation, and then extra spaces
-(define alice-text (string-normalize-spaces
-                    (remove-punctuation
-                     (string-downcase (port->string in)))))
+(define moby-text (string-normalize-spaces
+		   (remove-punctuation
+		    (string-downcase (port->string in)))))
 			 
 ;;; Close the input port
 (close-input-port in)
 
 ;;; To begin our sentiment analysis, we extract each unique word
 ;;; and the number of times it occurred in the document
-(define words (document->tokens alice-text #:sort? #t))
+(define words (document->tokens moby-text #:sort? #t))
 
 ;;; Using the nrc lexicon, we can label each (non stop-word) with an
 ;;; emotional label. The call to filter is used to remove tokens with no 
