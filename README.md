@@ -442,25 +442,26 @@ Individual functions, documented below, offer fine-grained control over analysis
 
 ;;; We can take a sneak peak at the data...
 (take sentiment 5)
-;;; --> '(("king" "positive" 25)
-;;;       ("foundation" "positive" 25)
-;;;       ("found" "trust" 24)
-;;;       ("white" "trust" 22)
-;;;       ("time" "anticipation" 22))
+;;; --> '(("ship" "anticipation" 518)
+;;;       ("sea" "positive" 455)
+;;;       ("long" "anticipation" 334)
+;;;       ("time" "anticipation" 334)
+;;;       ("captain" "positive" 329))
 
 ;;; sentiment, created above, consists of a list of triplets of the pattern
 ;;; (token sentiment freq) for each token in the document. Many words will have 
 ;;; the same sentiment label, so we aggregrate (by summing) across such tokens.
 (aggregate sum (map second sentiment) (map third sentiment))
-;;; --> '(("positive" 322)
-;;;       ("trust" 307)
-;;;       ("anticipation" 81)
-;;;       ("negative" 171)
-;;;       ("surprise" 65)
-;;;       ("sadness" 128)
-;;;       ("fear" 23)
-;;;       ("anger" 4)
-;;;       ("disgust" 1))
+;;; --> '(("anticipation" 1997)
+;;;       ("positive" 5442)
+;;;       ("trust" 5844)
+;;;       ("negative" 3955)
+;;;       ("sadness" 3064)
+;;;       ("surprise" 1449)
+;;;       ("fear" 466)
+;;;       ("disgust" 96)
+;;;       ("anger" 60)
+;;;       ("joy" 26))
 
 ;;; Better yet, we can visualize this result as a barplot (discrete-histogram)
 (parameterize ((plot-width 800))
@@ -479,7 +480,9 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;; positive-to-negative words 
 (define sentiment (filter (λ (x) (second x)) (list->sentiment words #:lexicon 'bing)))
 (plot (discrete-histogram
-       (aggregate sum (map second sentiment) (map third sentiment)))
+       (aggregate sum (map second sentiment) (map third sentiment))
+       #:y-min 0
+       #:y-max 8000)
       #:x-label "Sentiment Polarity"
       #:y-label "Frequency")
 ```
@@ -487,11 +490,50 @@ Individual functions, documented below, offer fine-grained control over analysis
 ![Sentiment Polarity](https://github.com/n3mo/data-science/raw/master/img/sentiment-positivity.png)
 
 ```racket
+;;; We can also look at which words are contributing the most to our
+;;; positive and negative sentiment scores. We'll look at the top 15
+;;; influential (i.e., most frequent) positive and negative words
+(define negative-tokens
+  (take (subset sentiment 1 (λ (x) (string=? x "negative"))) 15))
+(define positive-tokens
+  (take (subset sentiment 1 (λ (x) (string=? x "positive"))) 15))
+
+;;; Some clever reshaping for plotting purposes
+(define n (map (λ (x) (list (first x) (- 0 (third x))))
+	       negative-tokens))
+(define p (sort (map (λ (x) (list (first x) (third x)))
+		     positive-tokens)
+		(λ (x y) (< (second x) (second y)))))
+
+;;; Plot the results
+(parameterize ((plot-width 800)
+	       (plot-x-tick-label-anchor 'right)
+	       (plot-x-tick-label-angle 90))
+  (plot (list
+	 (tick-grid)
+	 (discrete-histogram n #:y-min -120
+			     #:y-max 655
+			     #:color "OrangeRed"
+			     #:line-color "OrangeRed"
+			     #:label "Negative Sentiment") 
+	 (discrete-histogram p #:y-min -116
+			     #:y-max 649
+			     #:x-min 15
+			     #:color "LightSeaGreen"
+			     #:line-color "LightSeaGreen"
+			     #:label "Positive Sentiment"))
+	#:x-label "Word"
+	#:y-label "Contribution to sentiment"))
+```
+
+![Word Contributions](https://github.com/n3mo/data-science/raw/master/img/sentiment-contributions.png)
+
+```racket
 ;;; Or, use the AFINN lexicon to determine the document's
 ;;; affective polarity
 (define sentiment (filter (λ (x) (second x)) (list->sentiment words #:lexicon 'AFINN)))
 (sum (map (λ (x) (* (second x) (third x))) sentiment))
-;;; --> 92
+;;; --> 1314
 ```
 
 ### document->tokens
