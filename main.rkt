@@ -6,9 +6,13 @@
 ;;; functions.
 
 ;;; Dependencies
+(require "./lexicons/nrc-lexicon")
+(require "./lexicons/bing-lexicon")
+(require "./lexicons/AFINN-lexicon")
 (require csv-reading math math/matrix plot)
+
 (provide aref read-csv ci subset $ group-with aggregate sorted-counts
-	 hist xs linear-model document->tokens token->sentiment
+	 hist hist* xs linear-model document->tokens token->sentiment
 	 list->sentiment remove-punctuation)
 
 ;;; Can't live without alist-ref from Chicken scheme. Let's recreate
@@ -285,9 +289,9 @@
 ;;; SENTIMENT ANALYSIS TOOLS
 
 ;;; Sentiment lexicons
-(define nrc (with-input-from-file "./lexicons/nrc-lexicon" (λ () (read))))
-(define bing (with-input-from-file "./lexicons/bing-lexicon" (λ () (read))))
-(define AFINN (with-input-from-file "./lexicons/AFINN-lexicon" (λ () (read))))
+;; (define nrc (with-input-from-file "./lexicons/nrc-lexicon" (λ () (read))))
+;; (define bing (with-input-from-file "./lexicons/bing-lexicon" (λ () (read))))
+;; (define AFINN (with-input-from-file "./lexicons/AFINN-lexicon" (λ () (read))))
 
 ;;; Convert text string into a list-of-lists counting the number of
 ;;; occurences for each token/word. 
