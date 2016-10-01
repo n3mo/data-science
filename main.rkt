@@ -13,7 +13,7 @@
 
 (provide aref read-csv ci subset $ group-with aggregate sorted-counts
 	 hist hist* xs linear-model document->tokens token->sentiment
-	 list->sentiment remove-punctuation qq-plot qq-plot*
+	 list->sentiment remove-urls remove-punctuation qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
 		       "./lexicons/AFINN-lexicon"))
@@ -285,7 +285,12 @@
 
 ;;; TEXT ANALYSIS TOOLS
 
-;;; Remove punctuation in a string
+;;; Remove URLs in a string
+(define (remove-urls str)
+  (regexp-replace* #px"http[s]?://[^ ]+\\b" str " "))
+
+;;; Remove punctuation in a string (you should typically remove-urls
+;;; before removing punctuation)
 (define (remove-punctuation str)
   (regexp-replace* #px"\\P{Ll}" str " "))
 

@@ -22,6 +22,7 @@ Many functions contained within are inspired by functionality commonly available
  - [Linear Regression Models](#linear-model)
 - [Text Processing](#text-processing)
  - [General Text Processing Tools](#text-processing-tools)
+  - [URL Removal](#remove-urls)
   - [Punctuation Removal](#remove-punctuation)
 - [Sentiment Analysis](#sentiment-analysis)
  - [Tokenizing Documents](#document-tokens)
@@ -380,6 +381,21 @@ Example: Multiple Linear Regression With Interactions. Individual predictors rep
 ```
 
 ## Text Processing
+
+### remove-urls
+
+```racket
+(remove-urls str)
+```
+
+Returns a copy string `str` with URLs removed.
+
+Examples: 
+
+```racket
+(remove-urls "This works for regular http://www.example.com and secure urls https://www.example.com")
+;;; --> "This works for regular   and secure urls  "
+```
 
 ### remove-punctuation
 
