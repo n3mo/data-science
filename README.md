@@ -24,6 +24,7 @@ Many functions contained within are inspired by functionality commonly available
  - [General Text Processing Tools](#text-processing-tools)
   - [URL Removal](#remove-urls)
   - [Punctuation Removal](#remove-punctuation)
+  - [Stop-word Removal](#remove-stopwords)
 - [Sentiment Analysis](#sentiment-analysis)
  - [Tokenizing Documents](#document-tokens)
  - [Token/word sentiment](#token-sentiment)
@@ -410,6 +411,30 @@ Examples:
 ```racket
 (remove-punctuation "hey, this sentence-which is great-has too; much punctuation!.?")
 ;;; --> "hey  this sentence which is great has too  much punctuation   "
+```
+
+### remove-stopwords
+
+```racket
+(remove-stopwords lst #:lexicon [lexicon 'SMART])
+```
+
+Returns a copy of list `lst` with stopwords removed. Note that the order of `lst` is NOT preserved. `#:lexicon` can be the symbols:
+
+- SMART --> Uses the SMART stop-word lexicon
+- snowball --> Uses the snowball stop-word lexicon
+- onix --> Uses the onix stop-word lexicon
+
+Examples:
+
+```racket
+;;; Default lexicon (SMART)
+(remove-stopwords (string-split "she is an engineer of great regard"))
+;;; --> '("regard" "great" "engineer")
+
+;;; Using a different lexicon
+(remove-stopwords (string-split "she is an engineer of great regard") #:lexicon 'onix)
+;;; --> '("regard" "engineer")
 ```
 
 ## Sentiment Analysis

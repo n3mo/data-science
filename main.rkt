@@ -301,6 +301,17 @@
 (define (remove-punctuation str)
   (regexp-replace* #px"\\P{Ll}" str " "))
 
+;;; Remove stopwords. This procedure expects a list of words and a
+;;; stopword lexicon of either 'SMART 'snowball or 'onix. It returns a
+;;; list of non stop-words
+(define (remove-stopwords lst #:lexicon [lexicon 'SMART])
+  (cond [(equal? lexicon 'SMART)
+	 (set-subtract lst SMART)]
+	[(equal? lexicon 'snowball)
+	 (set-subtract lst snowball)]
+	[(equal? lexicon 'onix)
+	 (set-subtract lst onix)]))
+
 ;;; SENTIMENT ANALYSIS TOOLS
 
 ;;; Sentiment lexicons
