@@ -17,7 +17,8 @@
 
 (provide aref read-csv ci subset $ group-with aggregate sorted-counts
 	 hist hist* xs linear-model document->tokens token->sentiment
-	 list->sentiment remove-urls remove-punctuation qq-plot qq-plot*
+	 list->sentiment remove-urls remove-punctuation
+	 remove-stopwords qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
 		       "./lexicons/AFINN-lexicon"
