@@ -9,6 +9,10 @@
 (require "./lexicons/nrc-lexicon")
 (require "./lexicons/bing-lexicon")
 (require "./lexicons/AFINN-lexicon")
+(require "./lexicons/SMART-stopwords")
+(require "./lexicons/snowball-stopwords")
+(require "./lexicons/onix-stopwords")
+
 (require csv-reading math math/matrix plot)
 
 (provide aref read-csv ci subset $ group-with aggregate sorted-counts
