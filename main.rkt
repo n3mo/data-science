@@ -20,7 +20,10 @@
 	 list->sentiment remove-urls remove-punctuation qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
-		       "./lexicons/AFINN-lexicon"))
+		       "./lexicons/AFINN-lexicon"
+		       "./lexicons/SMART-stopwords"
+		       "./lexicons/snowball-stopwords"
+		       "./lexicons/onix-stopwords"))
 
 ;;; Can't live without alist-ref from Chicken scheme. Let's recreate
 ;;; it here, but with a shorter name
