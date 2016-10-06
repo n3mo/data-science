@@ -16,6 +16,7 @@ Many functions contained within are inspired by functionality commonly available
  - [Counting Samples](#sorted-counts)
  - [Subsetting Data](#subset)
 - [Statistical Utilities](#general-utilities)
+ - [Logarithms](#log-base)
  - [Singular Value Decomposition](#singular-value-decomposition-1-dimensional)
  - [Data scaling: Z-transformation](#z-transform-data-scale)
 - [Statistical Tests/Models](#statistical-tests-and-models)
@@ -218,6 +219,27 @@ Examples:
 
 
 ## General Utilities
+
+### log-base (Logarithms with arbitrary base)
+
+```racket
+(log-base n #:base [base (exp 1)])
+```
+
+Returns the logarithm of `n`. The base can be set with `#:base`
+
+Examples:
+
+```racket
+;;; Same as the log function from racket/base
+(log-base 10)
+;;; --> 2.302585092994046
+
+;;; Compute a base-10 logarithm
+(log-base 10 #:base 10)
+;;; --> 1.0
+
+```
 
 ### Singular Value Decomposition (1-Dimensional)
 

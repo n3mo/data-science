@@ -16,8 +16,8 @@
 (require csv-reading math math/matrix plot)
 
 (provide aref read-csv ci subset $ group-with aggregate sorted-counts
-	 hist hist* xs linear-model document->tokens token->sentiment
-	 list->sentiment remove-urls remove-punctuation
+	 hist hist* scale log-base xs linear-model document->tokens
+	 token->sentiment list->sentiment remove-urls remove-punctuation
 	 remove-stopwords qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
@@ -173,6 +173,10 @@
   (let ([lst-mean (mean lst)]
 	[lst-stddev (stddev lst)])
     (map (λ (x) (/ (- x lst-mean) lst-stddev)) lst)))
+
+;;; Calculate logarithms with an arbitrary base
+(define (log-base n #:base [base (exp 1)])
+  (/ (log n) (log base)))
 
 ;;; Q-Q Plot. Plots sample quantiles against theoretical quantiles
 ;;; from a normal distribution with a mean and standard deviation
