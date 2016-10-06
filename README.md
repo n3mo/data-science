@@ -16,7 +16,7 @@ Many functions contained within are inspired by functionality commonly available
  - [Counting Samples](#sorted-counts)
  - [Subsetting Data](#subset)
 - [Statistical Utilities](#general-utilities)
- - [Logarithms](#log-base)
+ - [Logarithms](#log-base-logarithms-with-arbitrary-base)
  - [Singular Value Decomposition](#singular-value-decomposition-1-dimensional)
  - [Data scaling: Z-transformation](#z-transform-data-scale)
 - [Statistical Tests/Models](#statistical-tests-and-models)
