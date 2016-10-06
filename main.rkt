@@ -160,6 +160,20 @@
 	#:x-label "Value"
 	#:y-label "Frequency"))
 
+;;; This is a work in progress. The hist function above only works for
+;;; discrete data, and even then not well. This function will
+;;; eventually replace hist and hist*. It uses Sturge's formula to
+;;; automatically determine the number of bins.
+(define (better-hist s)
+  (let* ([s-min (apply min s)]
+	 [s-max (apply max s)]
+	 [k (ceiling (+ (log-base (length s) #:base 2) 1))]	 
+	 [step-size (/ (- s-max s-min) k)]
+	 [bins (stream->list (in-range (- s-min step-size) s-max step-size))]
+	 [bin-counts (map list bins (map sample-bin-total (bin-samples bins <= s)))])
+    (discrete-histogram bin-counts)))
+
+
 ;;; When you have a single list of values, it is useful to be able to
 ;;; plot the data as y-values. This requires creating token x values
 ;;; with (range (length ys)). Better to make this a short call for
