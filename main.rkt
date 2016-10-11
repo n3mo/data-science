@@ -162,12 +162,12 @@
 
 ;;; Pretty break points for histograms. Consider
 ;;; http://planspace.org/20141225-how_does_r_calculate_histogram_break_points/ 
-(define (pretty-breaks lst)
-  (let ([lo (apply min lst)]
-	[up (apply max lst)]
-	[rounding-eps 1e-7]
-	[dx (- up lo)]
-	[cell (max (abs lo) (abs up))])))
+;; (define (pretty-breaks lst)
+;;   (let ([lo (apply min lst)]
+;; 	[up (apply max lst)]
+;; 	[rounding-eps 1e-7]
+;; 	[dx (- up lo)]
+;; 	[cell (max (abs lo) (abs up))])))
 
 ;;; This is a work in progress. The hist function above only works for
 ;;; discrete data, and even then not well. This function will
