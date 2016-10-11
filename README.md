@@ -422,16 +422,20 @@ Examples:
 ### remove-punctuation
 
 ```racket
-(remove-punctuation str)
+(remove-punctuation str #:websafe? [websafe? #f])
 ```
 
-Returns a copy of string `str` with punctuation removed.
+Returns a copy of string `str` with punctuation removed. If websafe? is #t, meaningful web punctuation such as #hashtags and @usernames are untouched.
 
 Examples:
 
 ```racket
 (remove-punctuation "hey, this sentence-which is great-has too; much punctuation!.?")
 ;;; --> "hey  this sentence which is great has too  much punctuation   "
+
+;;; Clean up punctuation without removing hashtag and username info
+(remove-punctuation "clean, this up... but keep #hashtag1 and #hashtag2, along with the @user name!" #:websafe? #t)
+;; --> "clean this up but keep #hashtag1 and #hashtag2 along with the @user name"
 ```
 
 ### remove-stopwords
