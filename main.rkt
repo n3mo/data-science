@@ -328,7 +328,7 @@
 ;;; before removing punctuation)
 (define (remove-punctuation str #:websafe? [websafe? #f])
   (if websafe?
-      (regexp-replaces str '([#px"&amp" " "] [#px"\\|" " "] [#px"[:;.,!-=`~]" ""]))
+      (regexp-replaces str '([#px"&amp" " "] [#px"\\|" " "] [#px"[:;.,-=`~!]" ""]))
       (regexp-replace* #px"\\P{Ll}" str " ")))
 
 ;;; Remove stopwords. This procedure expects a list of words and a
