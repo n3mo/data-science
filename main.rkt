@@ -365,11 +365,20 @@
 ;;;   (3) 'AFINN : returns a -4 to +4 numerical score
 (define (token->sentiment token #:lexicon [lexicon 'nrc])
   (cond [(equal? lexicon 'nrc)
-	 (hash-ref nrc token #f)]
+	 (let ([results (subset nrc 'word (λ (x) (string=? x token)))])
+	   (if (> (length results) 1)
+	       (drop (map (λ (x) (list (first x) (second x))) results) 1)
+	       '()))]
 	[(equal? lexicon 'bing)
-	 (hash-ref bing token #f)]
+	 (let ([results (subset bing 'word (λ (x) (string=? x token)))])
+	   (if (> (length results) 1)
+	       (drop (map (λ (x) (list (first x) (second x))) results) 1)
+	       '()))]
 	[else
-	 (hash-ref AFINN token 0)]))
+	 (let ([results (subset AFINN 'word (λ (x) (string=? x token)))])
+	   (if (> (length results) 1)
+	       (drop (map (λ (x) (list (first x) (string->number (fourth x)))) results) 1)
+	       (list (list token 0))))]))
 
 ;;; Takes as input a list of pairs of the type (string number), such
 ;;; as output by document->tokens where string is a word from a text
@@ -379,10 +388,16 @@
 ;;;   (2) 'bing  : returns "positive" or "negative"
 ;;;   (3) 'AFINN : returns a -4 to +4 numerical score
 (define (list->sentiment lst #:lexicon [lexicon 'nrc])
-  (map (λ (x) (list
-	       (first x)
-	       (token->sentiment (first x) #:lexicon lexicon)
-	       (second x))) lst))
+  (define (pack-sentiment lst lexicon)
+    (apply append (list '("word" "sentiment" "freq"))
+	   (map (λ (x) 
+		  (let ([result (token->sentiment (first x) #:lexicon lexicon)])
+		    (map (λ (y) (append y (list (second x)))) result)))
+		lst)))
+  (let ([sentiment (pack-sentiment lst lexicon)])
+    (if (> (length sentiment) 1)
+	sentiment
+	'())))
 
 ;;; Example workflow:
 ;;; Read a document from file into a string:
