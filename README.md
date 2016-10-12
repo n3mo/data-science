@@ -631,8 +631,8 @@ Examples:
 
 For a given word/token `token`, returns its corresponding sentiment value if possible. `#:lexicon` can be the symbols:
 
-- nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or #f if `token` is unknown.
-- bing --> Returns a polarity label from the set (negative positive), or #f if `token` is unknown.
+- nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or '() if `token` is unknown.
+- bing --> Returns a polarity label from the set (negative positive), or '() if `token` is unknown.
 - AFINN --> Returns a sentiment score ranging from -4 (very negative) to +4 (very positive), or 0 if `token` is unknown.
 
 Examples:
@@ -641,35 +641,38 @@ Examples:
 ;;; nrc lexicon examples --------------------
 
 (token->sentiment "marriage" #:lexicon 'nrc)
-;;; --> "trust"
+;;; --> '(("marriage" "anticipation")
+;;;       ("marriage" "joy")
+;;;       ("marriage" "positive")
+;;;       ("marriage" "trust"))
 
 (token->sentiment "fire" #:lexicon 'nrc)
-;;; --> "fear"
+;;; --> '(("fire" "fear"))
 
 (token->sentiment "the" #:lexicon 'nrc)
-;;; --> #f
+;;; --> '()
 
 ;;; bing lexicon examples --------------------
 
 (token->sentiment "love" #:lexicon 'bing)
-;;; --> "positive"
+;;; --> '(("love" "positive"))
 
 (token->sentiment "hate" #:lexicon 'bing)
-;;; --> "negative"
+;;; --> '(("hate" "negative"))
 
 (token->sentiment "the" #:lexicon 'bing)
-;;; --> #f
+;;; --> '()
 
 ;;; AFINN lexicon examples --------------------
 
 (token->sentiment "love" #:lexicon 'AFINN)
-;;; --> 3
+;;; --> '(("love" 3))
 
 (token->sentiment "cry" #:lexicon 'AFINN)
-;;; --> -1
+;;; --> '(("cry" -1))
 
 (token->sentiment "everest" #:lexicon 'AFINN)
-;;; --> 0
+;;; --> '(("everest" 0))
 ```
 
 ### list->sentiment
@@ -680,8 +683,8 @@ Examples:
 
 Returns a list of sentiment values for `lst`, which is a list of pairs of words/tokens and their frequency, as returned by `document->tokens`. Returns a list of triplets of the form (token sentiment frequency). `#:lexicon` can be the symbols:
 
-- nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or #f if `token` is unknown.
-- bing --> Returns a polarity label from the set (negative positive), or #f if `token` is unknown.
+- nrc --> Returns an affective label from the set (anger anticipation disgust fear negative positive sadness surprise trust), or '() if `token` is unknown.
+- bing --> Returns a polarity label from the set (negative positive), or '() if `token` is unknown.
 - AFINN --> Returns a sentiment score ranging from -4 (very negative) to +4 (very positive), or 0 if `token` is unknown.
 
 Examples:
@@ -701,31 +704,34 @@ Examples:
 
 ;;; Convert the tokens into sentiment scores using the nrc lexicon
 (list->sentiment tokens #:lexicon 'nrc)
-;;; --> '(("happy" "trust" 3)
+;;; --> '(("word" "sentiment" "freq")
+;;;       ("happy" "anticipation" 3)
+;;;       ("happy" "joy" 3)
+;;;       ("happy" "positive" 3)
+;;;       ("happy" "trust" 3)
+;;;       ("love" "joy" 1)
 ;;;       ("love" "positive" 1)
-;;;       ("is" #f 1)
-;;;       ("better" #f 1)
-;;;       ("than" #f 1)
+;;;       ("ugly" "disgust" 2)
 ;;;       ("ugly" "negative" 2)
-;;;       ("mean" #f 1)
-;;;       ("old" #f 1)
+;;;       ("hate" "anger" 1)
+;;;       ("hate" "disgust" 1)
+;;;       ("hate" "fear" 1)
+;;;       ("hate" "negative" 1)
 ;;;       ("hate" "sadness" 1))
 
 ;;; Convert the tokens into sentiment scores using the bing lexicon
 (list->sentiment tokens #:lexicon 'bing)
-;;; --> '(("happy" "positive" 3)
-;;;       ("love" "positive" 1)
-;;;       ("is" #f 1)
-;;;       ("better" "positive" 1)
-;;;       ("than" #f 1)
-;;;       ("ugly" "negative" 2)
-;;;       ("mean" #f 1)
-;;;       ("old" #f 1)
-;;;       ("hate" "negative" 1))
+;;; --> '(("word" "sentiment" "freq")
+;;;      ("happy" "positive" 3)
+;;;      ("love" "positive" 1)
+;;;      ("better" "positive" 1)
+;;;      ("ugly" "negative" 2)
+;;;      ("hate" "negative" 1))
 
 ;;; Convert the tokens into sentiment scores using the AFINN lexicon
 (list->sentiment tokens #:lexicon 'AFINN)
-;;; --> '(("happy" 3 3)
+;;; --> '(("word" "sentiment" "freq")
+;;;       ("happy" 3 3)
 ;;;       ("love" 3 1)
 ;;;       ("is" 0 1)
 ;;;       ("better" 2 1)
@@ -734,7 +740,6 @@ Examples:
 ;;;       ("mean" 0 1)
 ;;;       ("old" 0 1)
 ;;;       ("hate" -3 1))
-
 ```
 
 ## Plotting Functions
