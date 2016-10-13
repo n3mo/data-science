@@ -22,6 +22,7 @@ Many functions contained within are inspired by functionality commonly available
  - [Data scaling: Z-transformation](#z-transform-data-scale)
 - [Statistical Tests/Models](#statistical-tests-and-models)
  - [Linear Regression Models](#linear-model)
+ - [Chi-Square Goodness of Fit Test](#chi-square-goodness)
 - [Text Processing](#text-processing)
  - [URL Removal](#remove-urls)
  - [Punctuation Removal](#remove-punctuation)
@@ -421,6 +422,30 @@ Example: Multiple Linear Regression With Interactions. Individual predictors rep
 
 ;; --> '(11.348195769005791 1.1439038728897226 0.4453766612762809 -0.0015873927901779573)
 
+```
+
+### chi-square-goodness
+
+```racket
+(chi-square-goodness lst p #:alpha [alpha 0.05])
+```
+
+Chi-square goodness of fit test. `lst` should contain variables and observered frequencies as a list of lists. `p` should be a list of hypothesized probabilities, one for each variable in `lst`. The alpha level (default 0.05) can be optionally set.
+
+Example:
+
+```racket
+;;; Some count data
+(define counts '(("yes" 2700) ("no" 2793)))
+
+;;; For this test, we assume equal probabilities (i.e., we expect
+;;; equal "yes" vs "no" responses.
+(chi-square-goodness counts '(0.5 0.5))
+;;; --> '#hash(('df . 1)
+;;;            ('result . "not-significant")
+;;;            ('Criterion . 3.8414588206941254)
+;;;            ('Chisqr . 1.5745494265428728)
+;;;            ('alpha . 0.05))
 ```
 
 ## Text Processing

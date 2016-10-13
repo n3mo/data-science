@@ -16,9 +16,9 @@
 (require csv-reading math math/matrix plot)
 
 (provide aref read-csv write-csv ci subset $ group-with aggregate sorted-counts
-	 hist hist* scale log-base xs linear-model document->tokens
-	 token->sentiment list->sentiment remove-urls remove-punctuation
-	 remove-stopwords qq-plot qq-plot*
+	 hist hist* scale log-base xs linear-model linear-model* chi-square-goodness
+	 document->tokens token->sentiment list->sentiment remove-urls
+	 remove-punctuation remove-stopwords qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
 		       "./lexicons/AFINN-lexicon"
@@ -334,6 +334,33 @@
 	    'p p
 	    'mse mse
 	    'root-mse root-mse))))
+
+;;; Chi-square goodness of fit test. lst should contain variables and
+;;; observered frequencies as a list of lists '(("Yes" 45) ("No"
+;;; 37)). p should be a list of hypothesized probabilities, one for
+;;; each variable in lst '(0.50 0.50). The alpha level (default 0.05)
+;;; can be optionally set.
+(define (chi-square-goodness lst p #:alpha [alpha 0.05])
+  (let* ([observed ($ lst 1)]
+	 [n (sum observed)]
+	 [df (- (length lst) 1)]
+	 [expected (map (λ (x) (* n x)) p)])
+    (let ([chisqr (sum (map
+			(λ (o e) (/ (expt (- o e) 2) e))
+			observed expected))]
+	  [criterion (inv-cdf (gamma-dist (/ df 2) 2) alpha #f null)])
+      (if (> chisqr criterion)
+	  (make-hash `(('Chisqr . ,chisqr)
+		       ('Criterion . ,criterion)
+		       ('alpha . ,alpha)
+		       ('df . ,df)
+		       ('result . "significant")))
+	  (make-hash `(('Chisqr . ,chisqr)
+		       ('Criterion . ,criterion)
+		       ('alpha . ,alpha)
+		       ('df . ,df)
+		       ('result . "not-significant")))))))
+
 
 ;;; One-dimensional singular value decomposition using the "Power
 ;;; Method". This is used by `svd` to estimate a full singular value
