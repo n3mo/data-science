@@ -442,10 +442,10 @@ Example:
 ;;; equal "yes" vs "no" responses.
 (chi-square-goodness counts '(0.5 0.5))
 ;;; --> '#hash(('df . 1)
+;;;            ('criterion . 3.8414588206941254)
 ;;;            ('result . "not-significant")
-;;;            ('Criterion . 3.8414588206941254)
-;;;            ('Chisqr . 1.5745494265428728)
-;;;            ('alpha . 0.05))
+;;;            ('alpha . 0.05)
+;;;            ('chisqr . 1.5745494265428728))
 ```
 
 ## Text Processing
