@@ -9,6 +9,7 @@ Many functions contained within are inspired by functionality commonly available
 - [Installation](#installation)
 - [Data Import/Export](#importexport)
  - [CSV Reading](#read-csv)
+ - [CSV Writing](#write-csv)
 - [Split -> Apply -> Combine Workflows](#split-apply-combine)
  - [Column Indexing](#-column-indexing)
  - [Aggregate](#aggregate)
@@ -46,7 +47,7 @@ raco pkg install https://github.com/n3mo/data-science.git
 
 ## Import/Export
 
-### Read-CSV
+### read-CSV
 
 ```racket
 (read-csv file-path [#:->number? #f
@@ -60,6 +61,26 @@ Example:
 ```racket
 ;;; Read a data file, converting to numeric data type
 (define data (read-csv "./my_data_file.csv" #:->number? #t))
+```
+
+### write-CSV
+
+```racket
+(write-csv lst file-path [#:delimeter #\,])
+```
+
+Writes a list-of-lists to file-path as comma-separated-values. The default delimeter is a comma.
+
+Example:
+
+```racket
+(define my-data '(("ship" "anticipation" 518)
+		  ("sea" "positive" 455)
+		  ("long" "anticipation" 334)
+		  ("time" "anticipation" 334)
+		  ("captain" "positive" 329)))
+
+(write-csv my-data "./data-results.csv")
 ```
 
 ## Split->Apply->Combine

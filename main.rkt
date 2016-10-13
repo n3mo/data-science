@@ -15,7 +15,7 @@
 
 (require csv-reading math math/matrix plot)
 
-(provide aref read-csv ci subset $ group-with aggregate sorted-counts
+(provide aref read-csv write-csv ci subset $ group-with aggregate sorted-counts
 	 hist hist* scale log-base xs linear-model document->tokens
 	 token->sentiment list->sentiment remove-urls remove-punctuation
 	 remove-stopwords qq-plot qq-plot*
@@ -34,10 +34,10 @@
 	(cadr tmp)
 	#f)))
 
-;;; Convenience csv reader that converts everything internally to
-;;; numbers by default. It also igores lines in the input file
-;;; commented with the "#" character. When header? is not #f, the
-;;; first line of the file is assumed to contain column names.
+;;; Convenience csv reader that can convert everything internally to
+;;; numbers. It also igores lines in the input file commented with the
+;;; "#" character. When header? is not #f, the first line of the file
+;;; is assumed to contain column names.
 (define (read-csv file-path
 		  #:->number? [->number? #f]
 		  #:header? [header? #t])
@@ -55,6 +55,41 @@
 		  (map (lambda (x) (map string->number x)) tmp))
 	      ;; Else, leave everything as strings
 	      tmp))))))
+
+;;; Embedded quotes (" or ') in csv files should be doubled. i.e.,
+;;; " -> "" and ' -> ''
+(define (string-cleaner strng)
+  (string-append "\"" (regexp-replace* "\"" strng "\"\"") "\""))
+
+;;; Missing, true/false, etc data can be adjusted here. Without this
+;;; step, true/false data would be written to file as #t/#f and
+;;; missing data as null. We could change those behaviors to
+;;; TRUE/FALSE and NA here.
+(define (format-csv-record record)
+  (cond
+   ;; [(eq? record #t) #t]
+   ;; [(eq? record #f) #f]
+   ;; [(eq? record 'null) null]
+   [(string? record) (string-cleaner record)]
+   [else record]))
+
+;;; This writes a list of lists (record) to disk. 
+(define (write-csv records file-path #:delimeter [delimeter #\,])
+  (with-output-to-file file-path
+    (λ ()
+     ;; Outer loop across rows
+     (for-each (lambda (row)
+		 ;; Inner loop across columns
+		 (let column-loop ((fields row))
+		   (if (null? fields)
+		       (newline)
+		       (let ((curr-field (format-csv-record (car fields)))
+			     (final? (null? (cdr fields))))
+			 ;; (write curr-field)
+			 (display curr-field)
+			 (when (not final?) (display delimeter))
+			 (column-loop (cdr fields))))))
+	       records))))
 
 ;;; Extract a particular column of data from a list of lists by
 ;;; (c)olumn (i)index number
