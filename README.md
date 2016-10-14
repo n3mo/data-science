@@ -538,7 +538,7 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;; punctuation, and then extra spaces
 (define moby-text (string-normalize-spaces
 		   (remove-punctuation
-		    (string-downcase (port->string in)))))
+		    (string-downcase (port->string in)) #:websafe? #t)))
 			 
 ;;; Close the input port
 (close-input-port in)
@@ -548,39 +548,38 @@ Individual functions, documented below, offer fine-grained control over analysis
 (define words (document->tokens moby-text #:sort? #t))
 
 ;;; Using the nrc lexicon, we can label each (non stop-word) with an
-;;; emotional label. The call to filter is used to remove tokens with no 
-;;; sentiment score (returned as #f)
-(define sentiment (filter (λ (x) (second x)) (list->sentiment words #:lexicon 'nrc)))
+;;; emotional label. 
+(define sentiment (list->sentiment words #:lexicon 'nrc))
 
 ;;; We can take a sneak peak at the data...
 (take sentiment 5)
-;;; --> '(("ship" "anticipation" 518)
-;;;       ("sea" "positive" 455)
-;;;       ("long" "anticipation" 334)
-;;;       ("time" "anticipation" 334)
-;;;       ("captain" "positive" 329))
+;;; --> '(("word" "sentiment" "freq")
+;;;       ("ship" "anticipation" 367)
+;;;       ("sea" "positive" 364)
+;;;       ("time" "anticipation" 318)
+;;;       ("long" "anticipation" 311))
 
 ;;; sentiment, created above, consists of a list of triplets of the pattern
 ;;; (token sentiment freq) for each token in the document. Many words will have 
 ;;; the same sentiment label, so we aggregrate (by summing) across such tokens.
-(aggregate sum (map second sentiment) (map third sentiment))
-;;; --> '(("anticipation" 1997)
-;;;       ("positive" 5442)
-;;;       ("trust" 5844)
-;;;       ("negative" 3955)
-;;;       ("sadness" 3064)
-;;;       ("surprise" 1449)
-;;;       ("fear" 466)
-;;;       ("disgust" 96)
-;;;       ("anger" 60)
-;;;       ("joy" 26))
+(aggregate sum ($ sentiment 'sentiment) ($ sentiment 'freq))
+;;; --> '(("anticipation" 4739)
+;;;       ("positive" 9206)
+;;;       ("joy" 3196)
+;;;       ("trust" 5095)
+;;;       ("surprise" 2157)
+;;;       ("negative" 7090)
+;;;       ("fear" 4136)
+;;;       ("sadness" 3317)
+;;;       ("anger" 2765)
+;;;       ("disgust" 1958))
 
 ;;; Better yet, we can visualize this result as a barplot (discrete-histogram)
 (parameterize ((plot-width 800))
   (plot (list
 	 (tick-grid)
 	 (discrete-histogram
-	  (aggregate sum (map second sentiment) (map third sentiment))))
+	  (aggregate sum ($ sentiment 'sentiment) ($ sentiment 'freq))))
 	#:x-label "Affective Label"
 	#:y-label "Frequency"))
 ```
@@ -590,9 +589,9 @@ Individual functions, documented below, offer fine-grained control over analysis
 ```racket
 ;;; Or, use the bing lexicon to determine the ratio of
 ;;; positive-to-negative words 
-(define sentiment (filter (λ (x) (second x)) (list->sentiment words #:lexicon 'bing)))
+(define sentiment (list->sentiment words #:lexicon 'bing))
 (plot (discrete-histogram
-       (aggregate sum (map second sentiment) (map third sentiment))
+       (aggregate sum ($ sentiment 'sentiment) ($ sentiment 'freq))
        #:y-min 0
        #:y-max 8000)
       #:x-label "Sentiment Polarity"
@@ -602,13 +601,27 @@ Individual functions, documented below, offer fine-grained control over analysis
 ![Sentiment Polarity](https://github.com/n3mo/data-science/raw/master/img/sentiment-positivity.png)
 
 ```racket
+;;; It seems that the text is slightly more negative than positive. We
+;;; test this using a chi-square goodness of fit test
+(let ([counts (aggregate sum ($ sentiment 'sentiment) ($ sentiment 'freq))])
+  (chi-square-goodness counts '(.5 .5)))
+;;; --> '#hash(('result . "significant")
+;;;            ('chisqr . 49.40294802172227)
+;;;            ('df . 1)
+;;;            ('criterion . 3.8414588206941254)
+;;;            ('alpha . 0.05))
+;;;
+;;; It does seem to a significant difference
+```
+
+```racket
 ;;; We can also look at which words are contributing the most to our
 ;;; positive and negative sentiment scores. We'll look at the top 15
 ;;; influential (i.e., most frequent) positive and negative words
 (define negative-tokens
-  (take (subset sentiment 1 (λ (x) (string=? x "negative"))) 15))
+  (take (cdr (subset sentiment 'sentiment (λ (x) (string=? x "negative")))) 15))
 (define positive-tokens
-  (take (subset sentiment 1 (λ (x) (string=? x "positive"))) 15))
+  (take (cdr (subset sentiment 'sentiment (λ (x) (string=? x "positive")))) 15))
 
 ;;; Some clever reshaping for plotting purposes
 (define n (map (λ (x) (list (first x) (- 0 (third x))))
@@ -643,9 +656,9 @@ Individual functions, documented below, offer fine-grained control over analysis
 ```racket
 ;;; Or, use the AFINN lexicon to determine the document's
 ;;; affective polarity
-(define sentiment (filter (λ (x) (second x)) (list->sentiment words #:lexicon 'AFINN)))
-(sum (map (λ (x) (* (second x) (third x))) sentiment))
-;;; --> 1314
+(define sentiment (list->sentiment words #:lexicon 'AFINN))
+(sum (map (λ (x) (* (second x) (third x))) (cdr sentiment)))
+;;; --> 1220
 ```
 
 ### document->tokens
