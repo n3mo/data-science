@@ -575,13 +575,16 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;;       ("disgust" 1958))
 
 ;;; Better yet, we can visualize this result as a barplot (discrete-histogram)
-(parameterize ((plot-width 800))
-  (plot (list
-	 (tick-grid)
-	 (discrete-histogram
-	  (aggregate sum ($ sentiment 'sentiment) ($ sentiment 'freq))))
-	#:x-label "Affective Label"
-	#:y-label "Frequency"))
+(let ([counts (aggregate sum ($ sentiment 'sentiment) ($ sentiment 'freq))])
+  (parameterize ((plot-width 800))
+    (plot (list
+	   (tick-grid)
+	   (discrete-histogram
+	    (sort counts (λ (x y) (> (second x) (second y))))
+	    #:color "MediumSlateBlue"
+	    #:line-color "MediumSlateBlue"))
+	  #:x-label "Affective Label"
+	  #:y-label "Frequency")))
 ```
 
 ![Affective Sentiment Labels](https://github.com/n3mo/data-science/raw/master/img/sentiment-labels.png)
@@ -590,12 +593,16 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;; Or, use the bing lexicon to determine the ratio of
 ;;; positive-to-negative words 
 (define sentiment (list->sentiment words #:lexicon 'bing))
-(plot (discrete-histogram
-       (aggregate sum ($ sentiment 'sentiment) ($ sentiment 'freq))
-       #:y-min 0
-       #:y-max 8000)
-      #:x-label "Sentiment Polarity"
-      #:y-label "Frequency")
+(parameterize ([plot-height 200])
+  (plot (discrete-histogram
+	 (aggregate sum ($ sentiment 'sentiment) ($ sentiment 'freq))
+	 #:y-min 0
+	 #:y-max 8000
+	 #:invert? #t
+	 #:color "MediumOrchid"
+	 #:line-color "MediumOrchid")
+	#:x-label "Frequency"
+	#:y-label "Sentiment Polarity"))
 ```
 
 ![Sentiment Polarity](https://github.com/n3mo/data-science/raw/master/img/sentiment-positivity.png)
@@ -611,7 +618,7 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;;            ('criterion . 3.8414588206941254)
 ;;;            ('alpha . 0.05))
 ;;;
-;;; It does seem to a significant difference
+;;; It does seem to be a significant difference
 ```
 
 ```racket
@@ -649,6 +656,10 @@ Individual functions, documented below, offer fine-grained control over analysis
 			     #:label "Positive Sentiment"))
 	#:x-label "Word"
 	#:y-label "Contribution to sentiment"))
+	
+;;; It seems that the word "like" is contributing extensively to the
+;;; positive sentiment. A more thorough analysis might
+;;; remove this word given its more common use as simile. 
 ```
 
 ![Word Contributions](https://github.com/n3mo/data-science/raw/master/img/sentiment-contributions.png)
