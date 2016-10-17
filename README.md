@@ -127,6 +127,9 @@ Examples:
 Examples:
 
 ```racket
+;;; A little help from the math module
+(require math)
+
 ;;; Say that we have responses from two experimental conditions, 
 ;;; "A" and "B," and we want to know about these two groups separately. 
 
