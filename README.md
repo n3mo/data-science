@@ -185,7 +185,7 @@ Data in `lst` are counted and sorted into a list of observed frequencies. Return
 (subset lst index f)
 ```
 
-Returns (filters) a subset of data from a list-of-lists *lst*. Column selection is controlled by *index,* which can be either a number or a symbol. If *index* is a number, data from the corresponding column is used. If *index* is a symbol, then the first row of *lst* is assumed to be a header containing named fields of each column. In this situation, data from the corresponding column of data identified by the column name is used, *excluding the first row*--that is, the header row is not subjected to filtering, and is returned un-touched as part of the returned subset. In either case, the values from the indexed column are filtered via the function *f*, which is a 1-parameter function that must return a boolean value. The returned value is a list-of-lists wherein the values in column *index* are #t according to *f*.
+Returns (filters) a subset of data from a list-of-lists *lst*. Column selection is controlled by *index,* which can be either a number or a symbol. If *index* is a number, data from the corresponding column is used. If *index* is a symbol, then the first row of *lst* is assumed to be a header containing named fields of each column. In this situation, data from the corresponding column of data identified by the column name is used, *excluding the first row*--that is, the header row is not subjected to filtering, and is returned un-touched as part of the returned subset. In either case, the values from the indexed column are filtered via *f*, which is either a 1-parameter function that must return a boolean value, or a string, symbol, or number, in which case filtering is completed with `(λ (x) (equal? x f))`. The returned value is a list-of-lists wherein the values in column *index* are #t according to *f*.
 
 Examples:
 
@@ -218,7 +218,8 @@ Examples:
 				
 ;;; If we only want to look at data from group 1 (drug #1), we can 
 ;;; subset that portion of the data set out.
-(subset sleep 'group (λ (x) (equal? x 1)))
+(subset sleep 'group 1)
+;;; Equivalently: (subset sleep 'group (λ (x) (equal? x 1)))
 ;; --> '((extra group ID)
          (0.7   1     1)
          (-1.6  1     2)
@@ -233,7 +234,8 @@ Examples:
 		 
 ;;; Combined with the `$` function, we can easily calculate the
 ;;; mean change in sleep for cond 1
-(mean ($ (subset sleep 'group (λ (x) (equal? x 1))) 'extra))
+(mean ($ (subset sleep 'group 1) 'extra))
+;;; Equivalently: (mean ($ (subset sleep 'group (λ (x) (equal? x 1))) 'extra))
 ;; --> 0.75
 
 ;;; Of course, for common practices such as the above example,
@@ -629,9 +631,9 @@ Individual functions, documented below, offer fine-grained control over analysis
 ;;; positive and negative sentiment scores. We'll look at the top 15
 ;;; influential (i.e., most frequent) positive and negative words
 (define negative-tokens
-  (take (cdr (subset sentiment 'sentiment (λ (x) (string=? x "negative")))) 15))
+  (take (cdr (subset sentiment 'sentiment "negative")) 15))
 (define positive-tokens
-  (take (cdr (subset sentiment 'sentiment (λ (x) (string=? x "positive")))) 15))
+  (take (cdr (subset sentiment 'sentiment "positive")) 15))
 
 ;;; Some clever reshaping for plotting purposes
 (define n (map (λ (x) (list (first x) (- 0 (third x))))
