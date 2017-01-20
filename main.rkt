@@ -18,7 +18,7 @@
 (provide aref read-csv write-csv ci subset $ group-with aggregate sorted-counts
 	 hist hist* scale log-base xs linear-model linear-model* chi-square-goodness
 	 svd-1d document->tokens token->sentiment list->sentiment remove-urls
-	 remove-punctuation remove-stopwords qq-plot qq-plot*
+	 remove-punctuation remove-stopwords n-gram qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
 		       "./lexicons/AFINN-lexicon"
@@ -408,6 +408,16 @@
 	 (set-subtract lst snowball)]
 	[(equal? lexicon 'onix)
 	 (set-subtract lst onix)]))
+
+;;; Extract n-grams from string. Returns list of all possible n-grams
+;;; of size `n` from the string `str`
+(define (n-gram str n)
+  (let loop ([words (string-split str)])
+    (if (or (null? words)
+	    (< (length (cdr words)) (sub1 n)))
+	'()
+	(cons (append (take words 1) (take (drop words 1) (sub1 n)))
+	      (loop (cdr words))))))
 
 ;;; SENTIMENT ANALYSIS TOOLS
 

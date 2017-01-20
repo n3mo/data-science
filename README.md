@@ -27,6 +27,7 @@ Many functions contained within are inspired by functionality commonly available
  - [URL Removal](#remove-urls)
  - [Punctuation Removal](#remove-punctuation)
  - [Stop-word Removal](#remove-stopwords)
+ - [n-gram Extraction](#n-gram)
 - [Sentiment Analysis](#sentiment-analysis)
  - [Tokenizing Documents](#document-tokens)
  - [Token/word sentiment](#token-sentiment)
@@ -511,6 +512,35 @@ Examples:
 ;;; Using a different lexicon
 (remove-stopwords (string-split "she is an engineer of great regard") #:lexicon 'onix)
 ;;; --> '("regard" "engineer")
+```
+
+### n-gram
+
+```racket
+(n-gram str n)
+```
+
+Returns a list of all possible n-grams of size `n` (for any `n` greater than zero) in string `str`. If `n` is greater than `(string-length str)` then '() is returned.
+
+Examples:
+
+```racket
+;;; Return all unigrams from a string
+(n-gram "what a time to be alive" 1)
+;;; --> '(("what") ("a") ("time") ("to") ("be") ("alive"))
+
+;;; Return all bigrams from a string
+(n-gram "what a time to be alive" 2)
+;;; --> '(("what" "a") ("a" "time") ("time" "to") ("to" "be") ("be" "alive"))
+
+;;; Return all trigrams from a string
+(n-gram "what a time to be alive" 3)
+;;; --> '(("what" "a" "time")
+;;;       ("a" "time" "to")
+;;;       ("time" "to" "be")
+;;;       ("to" "be" "alive"))
+
+;;; etc. for all n-grams
 ```
 
 ## Sentiment Analysis
