@@ -17,7 +17,7 @@
 
 (provide aref read-csv write-csv ci subset $ group-with aggregate sorted-counts
 	 hist hist* scale log-base xs linear-model linear-model* chi-square-goodness
-	 svd-1d document->tokens token->sentiment list->sentiment remove-urls
+	 svd-1d cov document->tokens token->sentiment list->sentiment remove-urls
 	 remove-punctuation remove-stopwords n-gram qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
@@ -382,6 +382,23 @@
 	(if (> (matrix-dot current-v previous-v) threshold)
 	    current-v
 	    (loop current-v))))))
+
+;;; Covariance matrix for lists x and y
+(define (cov x y)
+  (let* ((xbar (mean x))
+	 (ybar (mean y))
+	 (xn (length x))
+	 (yn (length y)))
+    (list->matrix
+     2 2
+     `(,(/ (apply + (map (λ (x) (* (- x xbar) (- x xbar))) x))
+	   (sub1 xn))
+       ,(/ (apply + (map (λ (x y) (* (- x xbar) (- y ybar))) x y))
+	   (sub1 xn))
+       ,(/ (apply + (map (λ (x y) (* (- y ybar) (- x xbar))) x y))
+	   (sub1 xn))
+       ,(/ (apply + (map (λ (x) (* (- x ybar) (- x ybar))) y))
+	   (sub1 yn))))))
 
 ;;; TEXT ANALYSIS TOOLS
 
