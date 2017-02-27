@@ -28,8 +28,8 @@ Many functions contained within are inspired by functionality commonly available
  - [Punctuation Removal](#remove-punctuation)
  - [Stop-word Removal](#remove-stopwords)
  - [n-gram Extraction](#n-gram)
-- [Sentiment Analysis](#sentiment-analysis)
  - [Tokenizing Documents](#document-tokens)
+- [Sentiment Analysis](#sentiment-analysis)
  - [Token/word sentiment](#token-sentiment)
  - [Document Sentiment](#list-sentiment)
 - [Plotting Utilities](#plotting-functions)
@@ -543,6 +543,26 @@ Examples:
 ;;; etc. for all n-grams
 ```
 
+### document->tokens
+
+```racket
+(document->tokens str [#:sort? #f])
+```
+
+For string `str`, returns a list of pairs. Each pair consists of a unique word/token from `str` with its frequency.
+
+Examples:
+
+```racket
+(document->tokens "there there are are two two of of everything everything except except this") 
+;;; --> '(("there" 2)
+;;;       ("are" 2)
+;;;       ("two" 2)
+;;;       ("of" 2)
+;;;       ("everything" 2)
+;;;       ("except" 2)
+;;;       ("this" 1))
+```
 ## Sentiment Analysis
 
 Sentiment analysis is commonly used to quickly determine the mood, or emotional valence of a body of text. The `data-science` package offers sentiment analysis via three different lexicons
@@ -705,27 +725,6 @@ Individual functions, documented below, offer fine-grained control over analysis
 (define sentiment (list->sentiment words #:lexicon 'AFINN))
 (sum (map (λ (x) (* (second x) (third x))) (cdr sentiment)))
 ;;; --> 1220
-```
-
-### document->tokens
-
-```racket
-(document->tokens str [#:sort? #f])
-```
-
-For string `str`, returns a list of pairs. Each pair consists of a unique word/token from `str` with its frequency.
-
-Examples:
-
-```racket
-(document->tokens "there there are are two two of of everything everything except except this") 
-;;; --> '(("there" 2)
-;;;       ("are" 2)
-;;;       ("two" 2)
-;;;       ("of" 2)
-;;;       ("everything" 2)
-;;;       ("except" 2)
-;;;       ("this" 1))
 ```
 
 ### token->sentiment
