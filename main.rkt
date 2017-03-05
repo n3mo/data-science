@@ -436,13 +436,6 @@
 	(cons (append (take words 1) (take (drop words 1) (sub1 n)))
 	      (loop (cdr words))))))
 
-;;; SENTIMENT ANALYSIS TOOLS
-
-;;; Sentiment lexicons
-;; (define nrc (with-input-from-file "./lexicons/nrc-lexicon" (λ () (read))))
-;; (define bing (with-input-from-file "./lexicons/bing-lexicon" (λ () (read))))
-;; (define AFINN (with-input-from-file "./lexicons/AFINN-lexicon" (λ () (read))))
-
 ;;; Convert text string into a list-of-lists counting the number of
 ;;; occurences for each token/word. 
 (define (document->tokens str #:sort? [sort? #f])
@@ -450,6 +443,31 @@
     (if sort?
 	(sort (map list x y) (λ (x y) (> (second x) (second y))))
 	(map list x y))))
+
+;;; Term document matrix using tf-idf. Accepts any number of
+;;; documents, as returned by (document->tokens ...)
+(define (tf-idf . docs)
+  (let ((words (apply set-union (map (λ (x) (map first x)) docs)))
+	(doc-Ns (map (λ (x) (apply + ($ x 1))) docs))
+	(corpus-N (length docs)))
+    (map (λ (word)
+	   (cons word
+		 (map (λ (doc doc-count)
+			(let ((tmp (subset doc 0 word))
+			      (num-words (length doc)))
+			  (if (null? tmp) 0 (/ (second (car tmp))
+					       doc-count))))
+		      docs
+		      doc-Ns)))
+	 words)))
+
+;;; SENTIMENT ANALYSIS TOOLS
+
+;;; Sentiment lexicons
+;; (define nrc (with-input-from-file "./lexicons/nrc-lexicon" (λ () (read))))
+;; (define bing (with-input-from-file "./lexicons/bing-lexicon" (λ () (read))))
+;; (define AFINN (with-input-from-file "./lexicons/AFINN-lexicon" (λ () (read))))
+
 
 ;;; Convert a token/word into a sentiment score. Lexicon can be either
 ;;;   (1) 'nrc   : returns emotional labels
