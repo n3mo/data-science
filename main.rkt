@@ -13,7 +13,7 @@
 (require "./lexicons/snowball-stopwords")
 (require "./lexicons/onix-stopwords")
 
-(require csv-reading math math/matrix plot)
+(require csv-reading math math/matrix plot racket/hash)
 
 (provide aref read-csv write-csv ci subset $ group-with aggregate sorted-counts
 	 hist hist* scale log-base xs linear-model linear-model* chi-square-goodness
@@ -460,6 +460,49 @@
 		      docs
 		      doc-Ns)))
 	 words)))
+
+;;; Calculates the normalized term frequency for each term in a
+;;; document (i.e., the number of times each term appears in a
+;;; document divided by the number of total terms in that
+;;; document). corpus is a list of lists, with each list as returned
+;;; by `document->tokens`
+(define (tdm corpus)
+  ;;; Create a unique list of items
+  (define (unique lst) (remove-duplicates lst))
+
+  ;;; Create a hash of zeroed-out values. This is used to ensure that
+  ;;; each document has a value of zero for words contained in other
+  ;;; documents, but not in itself. 
+  (define (make-zeros-hash keys)
+    (let ([n (length keys)])
+      (make-immutable-hash (map list keys (build-list n (λ (x) 0))))))
+
+  ;;; Turn a single document hash into one that contains all words
+  ;;; across all documents
+  (define (add-missing-terms hsh all-words)
+    (hash-union hsh
+		(make-zeros-hash all-words)
+		#:combine/key (λ (k v1 v2) v1)))
+
+  ;; Construct the term-document-matrix
+  (let* ([all-words (unique (apply append (map (λ (x) ($ x 0)) corpus)))]
+	 [tdm-hash
+	  (apply
+	   hash-union
+	   (map (λ (document)
+		  (add-missing-terms (make-immutable-hash document)
+				     all-words))
+		corpus)
+	   #:combine/key (λ (k v1 v2) (append v1 v2)))])
+    ;; We have the raw tdm counts. We normalize and turn into a tf-idf
+    ;; matrix 
+    (let ([raw-tdm (list*->matrix (hash-values tdm-hash))]
+	  [document-Ns (apply matrix+ (matrix-rows raw-tdm))]
+	  [term-Ns (apply matrix+ (matrix-cols raw-tdm))]
+	  [term-frequency (matrix-normalize-cols raw-tdm 1)])
+      (list
+       (hash-keys tdm-hash)
+       (list*->matrix (hash-values tdm-hash))))))
 
 ;;; SENTIMENT ANALYSIS TOOLS
 
