@@ -571,7 +571,7 @@ Examples:
 (tdm corpus)
 ```
 
-Calculates a term-document-matrix for the text in `corpus` (wherein matrix rows correspond to words/tokens and columns to individual documents). More specifically, the **term frequency-inverse document frequency** (tf-idf) matrix is returned. The racket/math matrix is returned in a list along with a list of words/tokens found across all documents. The order of the list of tokens corresponds to the rows in the returned tdm.
+Calculates a term-document-matrix for the text in `corpus` (wherein matrix rows correspond to words/tokens and columns to individual documents). More specifically, the **term frequency-inverse document frequency** (tf-idf) matrix is returned. `corpus` should be a list of values as returned by `document->tokens`. The racket/math matrix is returned in a list along with a list of words/tokens found across all documents. The order of the list of tokens corresponds to the rows in the returned tdm.
 
 Examples:
 
