@@ -17,7 +17,7 @@
 
 (provide aref read-csv write-csv ci subset $ group-with aggregate sorted-counts
 	 hist hist* scale log-base xs linear-model linear-model* chi-square-goodness
-	 svd-1d cov document->tokens token->sentiment list->sentiment remove-urls
+	 svd-1d cov document->tokens tdm token->sentiment list->sentiment remove-urls
 	 remove-punctuation remove-stopwords n-gram qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
@@ -444,27 +444,10 @@
 	(sort (map list x y) (λ (x y) (> (second x) (second y))))
 	(map list x y))))
 
-;;; Term document matrix using tf-idf. Accepts any number of
-;;; documents, as returned by (document->tokens ...)
-(define (tf-idf . docs)
-  (let ((words (apply set-union (map (λ (x) (map first x)) docs)))
-	(doc-Ns (map (λ (x) (apply + ($ x 1))) docs))
-	(corpus-N (length docs)))
-    (map (λ (word)
-	   (cons word
-		 (map (λ (doc doc-count)
-			(let ((tmp (subset doc 0 word))
-			      (num-words (length doc)))
-			  (if (null? tmp) 0 (/ (second (car tmp))
-					       doc-count))))
-		      docs
-		      doc-Ns)))
-	 words)))
-
-;;; Calculates the normalized term frequency for each term in a
-;;; document (i.e., the number of times each term appears in a
-;;; document divided by the number of total terms in that
-;;; document). corpus is a list of lists, with each list as returned
+;;; Calculates the term-document matrix for the list of documents
+;;; contained in corpus. Returns a list including an ordered list of
+;;; terms (words) that correspond to the rows of the tdm that is also
+;;; returned. corpus is a list of lists, with each list as returned
 ;;; by `document->tokens`
 (define (tdm corpus)
   ;;; Create a unique list of items
@@ -485,7 +468,8 @@
 		#:combine/key (λ (k v1 v2) v1)))
 
   ;; Construct the term-document-matrix
-  (let* ([all-words (unique (apply append (map (λ (x) ($ x 0)) corpus)))]
+  (let* ([num-docs (length corpus)]
+	 [all-words (unique (apply append (map (λ (x) ($ x 0)) corpus)))]
 	 [tdm-hash
 	  (apply
 	   hash-union
@@ -496,13 +480,26 @@
 	   #:combine/key (λ (k v1 v2) (append v1 v2)))])
     ;; We have the raw tdm counts. We normalize and turn into a tf-idf
     ;; matrix 
-    (let ([raw-tdm (list*->matrix (hash-values tdm-hash))]
-	  [document-Ns (apply matrix+ (matrix-rows raw-tdm))]
-	  [term-Ns (apply matrix+ (matrix-cols raw-tdm))]
-	  [term-frequency (matrix-normalize-cols raw-tdm 1)])
+    (let* ([raw-tdm (list*->matrix (hash-values tdm-hash))]
+	   ;; How frequently each terms appears in a document,
+	   ;; normalized 
+	   [tf (matrix-normalize-cols raw-tdm 1)]
+	   ;; Number of documents containing each term
+	   [docs-with-term (matrix-sum
+			    (matrix-cols
+			     (matrix-map (λ (x) (if (equal? x 0) 0 1))
+					 raw-tdm)))]
+	   ;; idf 
+	   [temp (matrix-map
+		  (λ (x) (log-base (/ num-docs x) #:base 10))
+		  docs-with-term)]
+	   [idf (matrix-augment (list temp temp))])
       (list
+       ;; Ordered list of terms
        (hash-keys tdm-hash)
-       (list*->matrix (hash-values tdm-hash))))))
+       ;; tf-idf, with row order matching the ordered list of terms
+       ;; also returned
+       (matrix-map * tf idf)))))
 
 ;;; SENTIMENT ANALYSIS TOOLS
 
