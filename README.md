@@ -29,6 +29,7 @@ Many functions contained within are inspired by functionality commonly available
  - [Stop-word Removal](#remove-stopwords)
  - [n-gram Extraction](#n-gram)
  - [Tokenizing Documents](#document-tokens)
+ - [Term Document Matrix](#tdm)
 - [Sentiment Analysis](#sentiment-analysis)
  - [Token/word sentiment](#token-sentiment)
  - [Document Sentiment](#list-sentiment)
@@ -563,6 +564,38 @@ Examples:
 ;;;       ("except" 2)
 ;;;       ("this" 1))
 ```
+
+### tdm
+
+```racket
+(tdm corpus)
+```
+
+Calculates a term-document-matrix for the text in `corpus` (wherein matrix rows correspond to words/tokens and columns to individual documents). More specifically, the **term frequency-inverse document frequency** (tf-idf) matrix is returned. The racket/math matrix is returned in a list along with a list of words/tokens found across all documents. The order of the list of tokens corresponds to the rows in the returned tdm.
+
+Examples:
+
+```racket
+;;; Two simple documents
+(define doc1 "this is a a sample")
+(define doc2 "this is another another example example example")
+
+;;; Convert each document to a list of term frequencies, passing both
+;;; to tdm
+(tdm (list
+      (document->tokens doc1)
+      (document->tokens doc2)))
+;; (list
+;;  '("sample" "this" "is" "a" "another" "example")
+;;  (array
+;;   #[#[0.06020599913279623 0]
+;;     #[0 0]
+;;     #[0 0]
+;;     #[0.12041199826559246 0]
+;;     #[0 0.0860085701897089]
+;;     #[0 0.12901285528456333]]))
+```
+
 ## Sentiment Analysis
 
 Sentiment analysis is commonly used to quickly determine the mood, or emotional valence of a body of text. The `data-science` package offers sentiment analysis via three different lexicons
