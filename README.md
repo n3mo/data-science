@@ -31,6 +31,7 @@ Many functions contained within are inspired by functionality commonly available
  - [Tokenizing Documents](#document-tokens)
  - [Document Term Matrix](#dtm)
  - [Term Document Matrix](#tdm)
+ - [Cosine Similarity](#cosine-similarity)
 - [Sentiment Analysis](#sentiment-analysis)
  - [Token/word sentiment](#token-sentiment)
  - [Document Sentiment](#list-sentiment)
