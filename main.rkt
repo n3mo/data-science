@@ -447,7 +447,7 @@
 ;;; Calculates the term-document matrix for the list of documents
 ;;; contained in corpus. Returns a list including an ordered list of
 ;;; terms (words) that correspond to the rows of the tdm that is also
-;;; returned. corpus is a list of lists, with each list as returned
+;;; returned. corpus is one or more lists, with each list as returned
 ;;; by `document->tokens`
 (define (tdm . corpus)
   ;;; Create a unique list of items
@@ -500,6 +500,16 @@
        ;; tf-idf, with row order matching the ordered list of terms
        ;; also returned
        (matrix-map * tf idf)))))
+
+;;; Same as tdm, but with documents returned as rows and terms as columns.
+(define (dtm . corpus)
+  (let ([temp (apply tdm corpus)])
+    ;; dtm is simply the transpose of the tdm
+    (list
+     ;; Ordered list of terms
+     (first temp)
+     ;; tf-idf in document-term-matrix format
+     (matrix-transpose (second temp)))))
 
 ;;; SENTIMENT ANALYSIS TOOLS
 

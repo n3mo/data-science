@@ -29,6 +29,7 @@ Many functions contained within are inspired by functionality commonly available
  - [Stop-word Removal](#remove-stopwords)
  - [n-gram Extraction](#n-gram)
  - [Tokenizing Documents](#document-tokens)
+ - [Document Term Matrix](#dtm)
  - [Term Document Matrix](#tdm)
 - [Sentiment Analysis](#sentiment-analysis)
  - [Token/word sentiment](#token-sentiment)
@@ -565,13 +566,38 @@ Examples:
 ;;;       ("this" 1))
 ```
 
+### dtm
+
+```racket
+(dtm . corpus)
+```
+
+Calculates a document-term-matrix for the text in `corpus` (wherein matrix rows correspond to documents and columns to individual words/tokens). More specifically, the **term frequency-inverse document frequency** (tf-idf) matrix is returned. `corpus` should be one or more values as returned by `document->tokens`. The racket/math matrix is returned in a list along with a list of words/tokens found across all documents. The order of the list of tokens corresponds to the columns in the returned dtm. This is the same as the `tdm` function--the returned matrix is simply the transpose of that returned by `tdm`.
+
+Examples:
+
+```racket
+;;; Two simple documents
+(define doc1 "this is a a sample")
+(define doc2 "this is another another example example example")
+
+;;; Convert each document to a list of term frequencies, passing both
+;;; to dtm
+(dtm (document->tokens doc1)
+     (document->tokens doc2))
+;; (list
+;;  '("sample" "this" "is" "a" "another" "example")
+;;  (array
+;;   #[#[0.06020599913279623 0 0 0.12041199826559246 0 0]
+;;     #[0 0 0 0 0.0860085701897089 0.12901285528456333]]))
+
 ### tdm
 
 ```racket
 (tdm . corpus)
 ```
 
-Calculates a term-document-matrix for the text in `corpus` (wherein matrix rows correspond to words/tokens and columns to individual documents). More specifically, the **term frequency-inverse document frequency** (tf-idf) matrix is returned. `corpus` should be one or more values as returned by `document->tokens`. The racket/math matrix is returned in a list along with a list of words/tokens found across all documents. The order of the list of tokens corresponds to the rows in the returned tdm.
+Calculates a term-document-matrix for the text in `corpus` (wherein matrix rows correspond to words/tokens and columns to individual documents). More specifically, the **term frequency-inverse document frequency** (tf-idf) matrix is returned. `corpus` should be one or more values as returned by `document->tokens`. The racket/math matrix is returned in a list along with a list of words/tokens found across all documents. The order of the list of tokens corresponds to the rows in the returned tdm. This is the same as the `dtm` function--the returned matrix is simply the transpose of that returned by `dtm`.
 
 Examples:
 
