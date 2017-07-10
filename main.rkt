@@ -17,7 +17,8 @@
 
 (provide aref read-csv write-csv ci subset $ group-with aggregate sorted-counts
 	 hist hist* scale log-base xs linear-model linear-model* chi-square-goodness
-	 svd-1d cov document->tokens tdm token->sentiment list->sentiment remove-urls
+	 svd-1d cov document->tokens tdm dtm cosine-similarity
+	 token->sentiment list->sentiment remove-urls
 	 remove-punctuation remove-stopwords n-gram qq-plot qq-plot*
 	 (all-from-out "./lexicons/nrc-lexicon"
 		       "./lexicons/bing-lexicon"
@@ -493,7 +494,7 @@
 	   [temp (matrix-map
 		  (λ (x) (log-base (/ num-docs x) #:base 10))
 		  docs-with-term)]
-	   [idf (matrix-augment (list temp temp))])
+	   [idf (matrix-augment (make-list num-docs temp))])
       (list
        ;; Ordered list of terms
        (hash-keys tdm-hash)
@@ -510,6 +511,31 @@
      (first temp)
      ;; tf-idf in document-term-matrix format
      (matrix-transpose (second temp)))))
+
+;;; Cosine similarity for two vectors (row matrices)
+(define (cosine-similarity v1 v2)
+  (/ (matrix-dot v1 v2)
+     (* (sqrt (matrix-dot v1 v1))
+	(sqrt (matrix-dot v2 v2)))))
+
+;;; Convenience function for reading a corpus of files contained in a
+;;; specified directory and converting each to a list of strings.
+(define (directory->strings path [extensions '(".txt")])
+  ;; Helper function for finding valid files
+  (define (file-list path)
+    (find-files (λ (x) (member (path-get-extension x)
+			       (map string->bytes/utf-8 extensions)))
+		(expand-user-path path)))
+  (if (directory-exists? (expand-user-path path))
+      (let ([file-list (file-list path)])
+	(map (λ (file)
+	       (file->string file))
+	     file-list))
+      ;; Hmm, directory doesn't seem to exist
+      (raise-argument-error 'directory->strings
+			    "valid-directory"
+			    path)))
+
 
 ;;; SENTIMENT ANALYSIS TOOLS
 

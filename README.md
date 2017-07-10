@@ -621,6 +621,26 @@ Examples:
 ;;     #[0 0.12901285528456333]]))
 ```
 
+### cosine-similarity
+
+```racket
+(cosine-similarity v1 v2)
+```
+
+Returns the cosine similarity for matrices v1 and v2.
+
+Example:
+
+```racket
+;;; Create two vectors
+(define v1 (row-matrix [5 0 3 0 2 0 0 2 0 0]))
+(define v2 (row-matrix [3 0 2 0 1 1 0 1 0 1]))
+
+;;; Similarity
+(cosine-similarity v1 v2)
+;; --> 0.9356014857063997
+```
+
 ## Sentiment Analysis
 
 Sentiment analysis is commonly used to quickly determine the mood, or emotional valence of a body of text. The `data-science` package offers sentiment analysis via three different lexicons
