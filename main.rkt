@@ -449,7 +449,7 @@
 ;;; terms (words) that correspond to the rows of the tdm that is also
 ;;; returned. corpus is a list of lists, with each list as returned
 ;;; by `document->tokens`
-(define (tdm corpus)
+(define (tdm . corpus)
   ;;; Create a unique list of items
   (define (unique lst) (remove-duplicates lst))
 

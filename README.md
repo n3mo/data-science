@@ -568,10 +568,10 @@ Examples:
 ### tdm
 
 ```racket
-(tdm corpus)
+(tdm . corpus)
 ```
 
-Calculates a term-document-matrix for the text in `corpus` (wherein matrix rows correspond to words/tokens and columns to individual documents). More specifically, the **term frequency-inverse document frequency** (tf-idf) matrix is returned. `corpus` should be a list of values as returned by `document->tokens`. The racket/math matrix is returned in a list along with a list of words/tokens found across all documents. The order of the list of tokens corresponds to the rows in the returned tdm.
+Calculates a term-document-matrix for the text in `corpus` (wherein matrix rows correspond to words/tokens and columns to individual documents). More specifically, the **term frequency-inverse document frequency** (tf-idf) matrix is returned. `corpus` should be one or more values as returned by `document->tokens`. The racket/math matrix is returned in a list along with a list of words/tokens found across all documents. The order of the list of tokens corresponds to the rows in the returned tdm.
 
 Examples:
 
@@ -582,9 +582,8 @@ Examples:
 
 ;;; Convert each document to a list of term frequencies, passing both
 ;;; to tdm
-(tdm (list
-      (document->tokens doc1)
-      (document->tokens doc2)))
+(tdm (document->tokens doc1)
+     (document->tokens doc2))
 ;; (list
 ;;  '("sample" "this" "is" "a" "another" "example")
 ;;  (array
