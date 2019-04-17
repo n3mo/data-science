@@ -499,7 +499,7 @@ Examples:
 (remove-stopwords lst #:lexicon [lexicon 'SMART])
 ```
 
-Returns a copy of list `lst` with stopwords removed. Note that the order of `lst` is NOT preserved. `#:lexicon` can be the symbols:
+Returns a copy of list `lst`, as returned by `document->tokens,` with stopwords removed. `#:lexicon` can be the symbols:
 
 - SMART --> Uses the SMART stop-word lexicon
 - snowball --> Uses the snowball stop-word lexicon
@@ -509,12 +509,20 @@ Examples:
 
 ```racket
 ;;; Default lexicon (SMART)
-(remove-stopwords (string-split "she is an engineer of great regard"))
-;;; --> '("regard" "great" "engineer")
+(define text "this is a story about technology and the negative effects that technology can have on our world")
+(define words (document->tokens text #:sort? #t))
+(remove-stopwords words)
+;;; --> '(("technology" 2) ("story" 1) ("negative" 1) ("effects" 1) ("world" 1))
 
 ;;; Using a different lexicon
-(remove-stopwords (string-split "she is an engineer of great regard") #:lexicon 'onix)
-;;; --> '("regard" "engineer")
+(remove-stopwords words #:lexicon 'snowball)
+;;; --> '(("technology" 2)
+;;;       ("story" 1)
+;;;       ("negative" 1)
+;;;       ("effects" 1)
+;;;       ("can" 1)
+;;;       ("world" 1))
+
 ```
 
 ### n-gram

@@ -421,11 +421,11 @@
 ;;; list of non stop-words
 (define (remove-stopwords lst #:lexicon [lexicon 'SMART])
   (cond [(equal? lexicon 'SMART)
-	 (set-subtract lst SMART)]
+	 (filter (λ (word) (not (member (first word) SMART))) lst)]
 	[(equal? lexicon 'snowball)
-	 (set-subtract lst snowball)]
+	 (filter (λ (word) (not (member (first word) snowball))) lst)]
 	[(equal? lexicon 'onix)
-	 (set-subtract lst onix)]))
+	 (filter (λ (word) (not (member (first word) onix))) lst)]))
 
 ;;; Extract n-grams from string. Returns list of all possible n-grams
 ;;; of size `n` from the string `str`
